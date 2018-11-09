@@ -1,0 +1,24 @@
+{
+  "name": "signalk-threshold-notifier",
+  "version": "1.0.0",
+  "description": "Issue notifications when some value exceeds some thresholds",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://githib.com/preeve9534/signalk-threshold-notifier"
+  },
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk",
+    "threshold",
+    "notifier",
+    "notifications"
+  ],
+  "author": "",
+  "license": "Apache-2.0"
+}
