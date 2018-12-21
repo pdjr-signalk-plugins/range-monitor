@@ -43,10 +43,8 @@ module.exports = function(app) {
 						return(0);
 					}
 				}).skipDuplicates().onValue(test => {
-                    if (test != 0) {
-                        log.N(`notifying on ${key}`);
-					    sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationrequest, threshold.notificationoptions);
-                    }
+                    log.N(`notifying on ${key}`);
+					sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationrequest, threshold.notificationoptions);
 				}));
 			}
 			return(acc);
@@ -74,8 +72,8 @@ module.exports = function(app) {
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (notificationoptions.includes("inrange")) {
-            test = "between";
-            threshold = `${lowthreshold} and ${highthreshold}`;
+            test = (lowthreshold === undefined)?"below":((highthreshold === undefined)?"above":"between");
+            threshold = (lowthreshold === undefined)?highthreshold:((highthreshold === undefined)?lowthreshold:`${lowthreshold} and ${highthreshold}`);
             message = eval("`" + message + "`");
             notificationValue = { "state": "normal", "message": message, "method": notificationrequest, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
