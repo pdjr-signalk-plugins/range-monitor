@@ -1,7 +1,7 @@
 # signalk-threshold-notifier
 
 A [Signal K Node Server](https://github.com/SignalK/signalk-server-node) plugin
-which raises notifications based on the value of a monitored sensor stream.
+which raises notifications based on the value of a monitored Signal K path.
 
 Thanks are due to Scott Bender for his
 [signalk-simple-notifications](https://github.com/sbender9/signalk-simple-notifications)
@@ -22,7 +22,7 @@ and installed using
 
  __signalk-threshold-notifier__ is configured through the Signal K Node server
 plugin configuration interface.
-Navigate to _Server_->_Plugin config_ and select the plugin tab.
+Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 Configuration is simply a matter of maintaining list of Signal K Node server
 paths which the plugin should monitor and specifying the conditons under a
