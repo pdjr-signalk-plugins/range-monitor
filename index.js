@@ -34,6 +34,7 @@ module.exports = function(app) {
 			if (enabled) {
 				var stream = app.streambundle.getSelfStream(key)
 				acc.push(stream.map(value => {
+                    threshold.value = value;
 					if ((threshold.lowthreshold !== undefined) && (value < threshold.lowthreshold)) {
 						return(-1);
 					} else if ((threshold.highthreshold !== undefined) && (value > threshold.highthreshold)) {
@@ -44,7 +45,7 @@ module.exports = function(app) {
 				}).skipDuplicates().onValue(test => {
                     if (test != 0) {
                         log.N(`notifying on ${key}`);
-					    sendNotificationUpdate(key, test, 1050, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationrequest, threshold.notificationoptions);
+					    sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationrequest, threshold.notificationoptions);
                     }
 				}));
 			}
