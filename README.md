@@ -9,7 +9,7 @@ Thanks are due to Scott Bender for his
 plugin which this work simply elaborates.
 ## System requirements
 
-__signalk-threshold-monitor__ has no special system requirements.
+__signalk-threshold-notifier__ has no special system requirements.
 ## Installation
 
 Download and install __signalk-threshold-notifier__ using the _Appstore_ link
