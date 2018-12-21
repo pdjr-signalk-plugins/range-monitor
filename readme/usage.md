@@ -50,7 +50,7 @@ where _n_ is the low threshold and _m_ is the high threshold.
 
 _${value}_ is the instantaneous value of the monitored path that caused the
 
-For examle `Waste water tank level is ${test} ${threshold} (currently ${value})`
+For examle `${vessel}: waste water tank level is ${test} ${threshold} (currently ${value})`
 
 __Threshold__
 
