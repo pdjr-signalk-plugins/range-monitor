@@ -1,7 +1,11 @@
 # signalk-threshold-notifier
 
-A Signal K Node server plugin which raises notifications based on the value of
-a monitored sensor stream.
+A [Signal K Node Server](https://github.com/SignalK/signalk-server-node) plugin
+which raises notifications based on the value of a monitored sensor stream.
+
+Thanks are due to Scott Bender for his
+[signalk-simple-notifications](https://github.com/sbender9/signalk-simple-notifications)
+plugin which this work simply elaborates.
 ## System requirements
 
 __signalk-threshold-monitor__ has no special system requirements.
@@ -59,38 +63,51 @@ For examle `Waste water tank level is ${test} ${threshold} (currently ${value})`
 
 __Threshold__
 
-    The _Threshold_ entry specifies one or two thresholds which define a value
-    range and the type of notification which will be issued if the monitored
-    path value moves outside this range.
+The _Threshold_ entry specifies one or two thresholds which define a value
+range and the type of notification which will be issued if the monitored
+path value moves outside this range.
 
-    __Low__  
-    If supplied, specifies the lower threshold for raising a notification: if
-    the monitored data stream falls below this value then a notification will
-    be issued.
-    The default value is undefined which means that there is no lower
-    thresold.
+__--> Low__  
+If supplied, specifies the lower threshold for raising a notification: if
+the monitored data stream falls below this value then a notification will
+be issued.
+The default value is undefined which means that there is no lower
+thresold.
 
-    __High__  
-    If supplied, specifies the upper threshold for raising a notification: if
-    the monitored data stream rises above this value then a notification will
-    be issued.
-    The default value is undefined which means that there is no upper
-    thresold.
+__--> High__  
+If supplied, specifies the upper threshold for raising a notification: if
+the monitored data stream rises above this value then a notification will
+be issued.
+The default value is undefined which means that there is no upper
+thresold.
 
-    __Alarm__  
-    The type of notification to be raised when one or other threshold is
-    passed.
-    Default is _Alert_.
+__--> Alarm__  
+The type of notification to be raised when one or other threshold is
+passed.
+Default is _Alert_.
 
-    __Request__  
-    A suggestion for the alert medium to be used when this notification is
-    ultimately processed by some notification handler.
-    Default is no suggestion.
+__--> Request__  
+A suggestion for the alert medium to be used when this notification is
+ultimately processed by some notification handler.
+Default is no suggestion.
 
-    __Options__  
-    The _In-range_ option requests that a notification also be issued when the
-    monitored data stream re-enters the normal region after transiting one or
-    other threshold.
-    Default is not to issue the in-range notification.
-    Any issued notification will contain the simple message "_path_ value is
-    nominal" and will have a type of "Normal".
+__--> Options__  
+The _In-range_ option requests that a notification also be issued when the
+monitored data stream re-enters the normal region after transiting one or
+other threshold.
+Default is not to issue the in-range notification.
+Any issued notification will contain the simple message "_path_ value is
+nominal" and will have a type of "Normal".
+## Messages
+
+__signalk-threshold-notifier__ outputs the following messages to the Signal K
+Node server console and the host system logs.
+
+__Monitoring _n_ path__[__s__]  
+Output when the plugin initialises to report the number, _n_, of Signal K
+paths that are being monitored for threshold transition events.
+
+__Notifying on _path__
+Output when the plugin issues a threshold transition notification.
+The message on the server console persists for a few seconds before
+the normal status message is restored.

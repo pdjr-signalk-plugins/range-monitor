@@ -11,7 +11,7 @@ module.exports = function(app) {
 
 	plugin.id = "threshold-notifier";
 	plugin.name = "Threshold notifier";
-	plugin.description = "Issue notifications when some value exceeds some thresholds";
+	plugin.description = "Issue notifications when some value exceeds some thresholds.";
 
     const log = new Log(app.setProviderStatus, app.setProviderError, plugin.id);
 
@@ -24,7 +24,7 @@ module.exports = function(app) {
 	}
 
 	plugin.start = function(options) {
-        log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"));
+        log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
 		unsubscribes = (options.paths || []).reduce((acc, {
 			enabled,
 			key,
@@ -62,21 +62,23 @@ module.exports = function(app) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
+		var vesselName = app.getSelfPath("name");
+        var threshold = "";
 
 		if (test != 0) {
-			var vesselName = app.getSelfPath("name");
-		    var test = (test == -1)?"below":"above";
-		    var threshold = (test == -1)?lowthreshold:highthreshold;
-		    var message = (message === undefined)?app.getSelfPath(key + ".meta.displayName"):((!message)?key:eval("`" + message + "`"));
+		    test = (test == -1)?"below":"above";
+		    threshold = (test == -1)?lowthreshold:highthreshold;
+		    message = (message === undefined)?app.getSelfPath(key + ".meta.displayName"):((!message)?key:eval("`" + message + "`"));
             notificationValue = { "state": notificationtype, "message": `${vesselName}: ${message}`, "method": notificationrequest, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
-		    //delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
 		} else if (notificationoptions.includes("inrange")) {
-            notificationValue = { "state": "normal", "message": "", "timestamp": date };
+            test = "between";
+            threshold = `${lowthreshold} and ${highthreshold}`;
+            message = eval("`" + message + "`");
+            notificationValue = { "state": "normal", "message": `${vesselName}: ${message}`, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
-		    //var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
 		}
 	}
 

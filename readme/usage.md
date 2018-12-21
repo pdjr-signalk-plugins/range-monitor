@@ -43,38 +43,38 @@ For examle `Waste water tank level is ${test} ${threshold} (currently ${value})`
 
 __Threshold__
 
-    The _Threshold_ entry specifies one or two thresholds which define a value
-    range and the type of notification which will be issued if the monitored
-    path value moves outside this range.
+The _Threshold_ entry specifies one or two thresholds which define a value
+range and the type of notification which will be issued if the monitored
+path value moves outside this range.
 
-    __Low__  
-    If supplied, specifies the lower threshold for raising a notification: if
-    the monitored data stream falls below this value then a notification will
-    be issued.
-    The default value is undefined which means that there is no lower
-    thresold.
+__--> Low__  
+If supplied, specifies the lower threshold for raising a notification: if
+the monitored data stream falls below this value then a notification will
+be issued.
+The default value is undefined which means that there is no lower
+thresold.
 
-    __High__  
-    If supplied, specifies the upper threshold for raising a notification: if
-    the monitored data stream rises above this value then a notification will
-    be issued.
-    The default value is undefined which means that there is no upper
-    thresold.
+__--> High__  
+If supplied, specifies the upper threshold for raising a notification: if
+the monitored data stream rises above this value then a notification will
+be issued.
+The default value is undefined which means that there is no upper
+thresold.
 
-    __Alarm__  
-    The type of notification to be raised when one or other threshold is
-    passed.
-    Default is _Alert_.
+__--> Alarm__  
+The type of notification to be raised when one or other threshold is
+passed.
+Default is _Alert_.
 
-    __Request__  
-    A suggestion for the alert medium to be used when this notification is
-    ultimately processed by some notification handler.
-    Default is no suggestion.
+__--> Request__  
+A suggestion for the alert medium to be used when this notification is
+ultimately processed by some notification handler.
+Default is no suggestion.
 
-    __Options__  
-    The _In-range_ option requests that a notification also be issued when the
-    monitored data stream re-enters the normal region after transiting one or
-    other threshold.
-    Default is not to issue the in-range notification.
-    Any issued notification will contain the simple message "_path_ value is
-    nominal" and will have a type of "Normal".
+__--> Options__  
+The _In-range_ option requests that a notification also be issued when the
+monitored data stream re-enters the normal region after transiting one or
+other threshold.
+Default is not to issue the in-range notification.
+Any issued notification will contain the simple message "_path_ value is
+nominal" and will have a type of "Normal".
