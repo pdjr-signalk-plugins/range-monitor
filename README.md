@@ -25,20 +25,23 @@ and installed using
 plugin configuration interface.
 Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
-Configuration is simply a matter of maintaining list of Signal K Node server
-paths which the plugin should monitor and specifying the conditons under a
-which notification should be raised and the attributes of the raised
-notification.
-On first use the monitored path list will be empty.
+Configuration is simply a matter of maintaining a list of the Signal K Node
+server paths which the plugin should monitor and specifying the conditons
+under which notifications should be raised and the attributes which should be
+associated with them.
+
+On first use the list of monitored paths will be empty.
 A new path can be added by clicking the __[+]__ button which will open an
 empty configuration panel.
+An existing, unwanted path can be deleted by licking the __[x]__ button
+adjacent to the path's configuration panel. 
 
 ![Configuration panel](readme/screenshot.png)
 
-The configuration panel consists of the following fields.
+The configuration panel for a monitored path consists of the following fields.
 
-__Enabled?__  
-Whether or not the following path is being (should be)  monitored.
+__Enabled__  
+Checkbox specifying whether or not the path should be monitored.
 Default is yes (checked).
 Change this to temporarily disable individual notifications rather than
 permanently deleting them.
@@ -46,7 +49,7 @@ permanently deleting them.
 __Signal K path to monitor__  
 The Signal K Node server path which should be monitored.
 There is no default value.
-Enter here the full Signal K path for the sensor value which you would like to
+Enter here the full Signal K path for the value which you would like to
 monitor, for example, `tanks.wasteWater.0.currentValue`.
 
 __Notification message__  
@@ -54,11 +57,19 @@ The text of the message which will be issued as part of any notification.
 Default is the empty string.
 Enter here the text of the message you would like to be issued when the
 monitored path value crosses one of the defined thresholds.
-Three tokens are available which will be replaced when the message is
-composed: ${test} will be replaced by either "above" or "below" (depended upon
-the threshold being crossed), ${threshold} will be replaced with the value of
-the threshold being crossed and ${value} will be replaced by the sensor
-value at the time the alert was issues.
+If any of the following tokens are used they will be interpolated when the
+notification message is composed:
+
+_${vessel}_ will be replaced with Signal K's idea of the vessel name.
+
+_${test}_ will be replaced by one of "above", "below" or "between"
+dependant upon the threshold being crossed and the direction of crossing.
+
+_${threshold}_ will be replaced with the value of the threshold or, in the
+case of the path value being between thresholds with the string "_n_ and _m_"
+where _n_ is the low threshold and _m_ is the high threshold.
+
+_${value}_ is the instantaneous value of the monitored path that caused the
 
 For examle `Waste water tank level is ${test} ${threshold} (currently ${value})`
 
@@ -66,18 +77,18 @@ __Threshold__
 
 The _Threshold_ entry specifies one or two thresholds which define a value
 range and the type of notification which will be issued if the monitored
-path value moves outside this range.
+path value moves into or out of this range.
 
 __--> Low__  
 If supplied, specifies the lower threshold for raising a notification: if
-the monitored data stream falls below this value then a notification will
+the monitored path value falls below this value then a notification will
 be issued.
 The default value is undefined which means that there is no lower
 thresold.
 
 __--> High__  
 If supplied, specifies the upper threshold for raising a notification: if
-the monitored data stream rises above this value then a notification will
+the monitored path value rises above this value then a notification will
 be issued.
 The default value is undefined which means that there is no upper
 thresold.
@@ -94,11 +105,9 @@ Default is no suggestion.
 
 __--> Options__  
 The _In-range_ option requests that a notification also be issued when the
-monitored data stream re-enters the normal region after transiting one or
-other threshold.
+monitored path value re-enters the 'between-thresholds' region after
+transiting one or other threshold.
 Default is not to issue the in-range notification.
-Any issued notification will contain the simple message "_path_ value is
-nominal" and will have a type of "Normal".
 ## Messages
 
 __signalk-threshold-notifier__ outputs the following messages to the Signal K
