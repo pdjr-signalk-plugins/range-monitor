@@ -5,6 +5,8 @@ a monitored sensor stream.
 ## System requirements
 
 __signalk-threshold-monitor__ has no special system requirements.
+## Installation
+
 Download and install __signalk-threshold-notifier__ using the _Appstore_ link
 in your Signal K Node server console.
 
