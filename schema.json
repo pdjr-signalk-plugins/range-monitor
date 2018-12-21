@@ -1,0 +1,77 @@
+{
+	"type": "object",
+	"properties": {
+		"paths": {
+			"type": "array",
+			"title": "Monitored paths",
+			"default": [],
+			"items": {
+				"title": "Path",
+				"type": "object",
+				"required": ["key"],
+				"properties": {
+					"enabled": {
+						"title": "Enabled",
+						"type": "boolean",
+						"default": true
+					},
+					"key": {
+						"title": "Signal K path to monitor",
+                        "description": "Path referencing the value to monitor",
+						"type": "string",
+						"default": ""
+					},
+					"message": {
+						"title": "Notification message",
+						"description": "Text of notification. Use ${test}, ${threshold} and/or ${value} to interpolate strings",
+						"type": "string",
+                        "default": ""
+					},
+                    "threshold": {
+                        "title": "Threshold",
+                        "type": "object",
+                        "properties": {
+					        "lowthreshold": {
+						        "title": "Low",
+						        "type": "number"
+					        },						
+					        "highthreshold": {
+						        "title": "High",
+						        "type": "number"
+					        },						
+					        "notificationtype": {
+						        "type": "string",
+						        "title": "Alarm",
+						        "default": "normal",
+						        "enum": ["normal", "alert", "warn", "alarm", "emergency"],
+						        "enumNames": ["normal", "alert", "warning", "alarm", "emergency"]
+					        },
+                            "notificationrequest": {
+                                "title": "Request",
+                                "type": "array",
+                                "default": [],
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "visual", "sound" ],
+                                    "enumNames": [ "visual", "sound" ]
+                                },
+                                "uniqueItems": true
+                            },
+                            "notificationoptions": {
+                                "title": "Options",
+                                "type": "array",
+                                "default": [],
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "inrange" ],
+                                    "enumNames": [ "in-range" ]
+                                },
+                                "uniqueItems": true
+                            }
+                        }
+                    }
+                }
+			}
+		}
+	}
+}
