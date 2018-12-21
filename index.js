@@ -62,22 +62,23 @@ module.exports = function(app) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
-		var vesselName = app.getSelfPath("name");
+		var vessel = app.getSelfPath("name");
         var threshold = "";
 
 		if (test != 0) {
 		    test = (test == -1)?"below":"above";
 		    threshold = (test == -1)?lowthreshold:highthreshold;
 		    message = (message === undefined)?app.getSelfPath(key + ".meta.displayName"):((!message)?key:eval("`" + message + "`"));
-            notificationValue = { "state": notificationtype, "message": `${vesselName}: ${message}`, "method": notificationrequest, "timestamp": date };
+            notificationValue = { "state": notificationtype, "message": message, "method": notificationrequest, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (notificationoptions.includes("inrange")) {
             test = "between";
             threshold = `${lowthreshold} and ${highthreshold}`;
             message = eval("`" + message + "`");
-            notificationValue = { "state": "normal", "message": `${vesselName}: ${message}`, "timestamp": date };
+            notificationValue = { "state": "normal", "message": message, "method": notificationrequest, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
+            app.debug("delta: " + JSON.stringify(delta));
 		    app.handleMessage(plugin.id, delta);
 		}
 	}
