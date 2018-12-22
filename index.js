@@ -45,18 +45,18 @@ module.exports = function(app) {
 		unsubscribes = (options.paths || [])
         .reduce((a, path) => {
             path.thresholds.forEach(threshold => {
-                a.push({ "enabled": path.enabled, "key": path.key, "message": path.message, "threshold": threshold });
+                a.push({ "enabled": path.enabled, "key": path.path, "message": path.message, "threshold": threshold });
             });
             return(a);
         }, [])
         .reduce((acc, {
 			enabled,
-			key,
+			path,
 			message,
             threshold
 		}) => {
 			if (enabled) {
-				var stream = app.streambundle.getSelfStream(key)
+				var stream = app.streambundle.getSelfStream(path)
 				acc.push(stream.map(value => {
                     threshold.value = value;
 					if ((threshold.lowthreshold !== undefined) && (value < threshold.lowthreshold)) {
@@ -67,8 +67,8 @@ module.exports = function(app) {
 						return(0);
 					}
 				}).skipDuplicates().onValue(test => {
-                    log.N(`notifying on ${key}`);
-					sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationoptions);
+                    log.N(`notifying on ${path}`);
+					sendNotificationUpdate(path, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationoptions);
 				}));
 			}
 			return(acc);
@@ -81,17 +81,17 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-	function sendNotificationUpdate(key, test, value, message, lowthreshold, highthreshold, notificationtype, notificationoptions) {
+	function sendNotificationUpdate(path, test, value, message, lowthreshold, highthreshold, notificationtype, notificationoptions) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
-		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
+		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + path, "value": notificationValue } ] } ] };
 		var vessel = app.getSelfPath("name");
         var threshold = "";
 
 		if (test != 0) {
 		    test = (test == -1)?"below":"above";
 		    threshold = (test == -1)?lowthreshold:highthreshold;
-		    message = (message === undefined)?app.getSelfPath(key + ".meta.displayName"):((!message)?key:eval("`" + message + "`"));
+		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
             notificationValue = { "state": notificationtype, "message": message, "method": notificationoptions, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);

@@ -18,7 +18,7 @@
 						"type": "boolean",
 						"default": true
 					},
-					"key": {
+					"path": {
 						"title": "Signal K path to monitor",
                         "description": "Path referencing the value to monitor.",
 						"type": "string",
