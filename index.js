@@ -25,7 +25,14 @@ module.exports = function(app) {
 
 	plugin.start = function(options) {
         log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
-		unsubscribes = (options.paths || []).reduce((acc, {
+		unsubscribes = (options.paths || [])
+        .reduce((a, path) => {
+            path.thresholds.forEach(threshold => {
+                a.push({ "enabled": path.enabled, "key": path.key, "message": path.message, "threshold": threshold });
+            });
+            return(a);
+        }, [])
+        .reduce((acc, {
 			enabled,
 			key,
 			message,
@@ -44,7 +51,7 @@ module.exports = function(app) {
 					}
 				}).skipDuplicates().onValue(test => {
                     log.N(`notifying on ${key}`);
-					sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationrequest, threshold.notificationoptions);
+					sendNotificationUpdate(key, test, threshold.value, message, threshold.lowthreshold, threshold.highthreshold, threshold.notificationtype, threshold.notificationoptions);
 				}));
 			}
 			return(acc);
@@ -57,7 +64,7 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-	function sendNotificationUpdate(key, test, value, message, lowthreshold, highthreshold, notificationtype, notificationrequest, notificationoptions) {
+	function sendNotificationUpdate(key, test, value, message, lowthreshold, highthreshold, notificationtype, notificationoptions) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + key, "value": notificationValue } ] } ] };
@@ -68,14 +75,14 @@ module.exports = function(app) {
 		    test = (test == -1)?"below":"above";
 		    threshold = (test == -1)?lowthreshold:highthreshold;
 		    message = (message === undefined)?app.getSelfPath(key + ".meta.displayName"):((!message)?key:eval("`" + message + "`"));
-            notificationValue = { "state": notificationtype, "message": message, "method": notificationrequest, "timestamp": date };
+            notificationValue = { "state": notificationtype, "message": message, "method": notificationoptions, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (notificationoptions.includes("inrange")) {
             test = (lowthreshold === undefined)?"below":((highthreshold === undefined)?"above":"between");
             threshold = (lowthreshold === undefined)?highthreshold:((highthreshold === undefined)?lowthreshold:`${lowthreshold} and ${highthreshold}`);
             message = eval("`" + message + "`");
-            notificationValue = { "state": "normal", "message": message, "method": notificationrequest, "timestamp": date };
+            notificationValue = { "state": "normal", "message": message, "method": notificationoptions, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
             app.debug("delta: " + JSON.stringify(delta));
 		    app.handleMessage(plugin.id, delta);
