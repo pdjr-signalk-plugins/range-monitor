@@ -6,7 +6,7 @@
 			"title": "Monitored paths",
 			"default": [{
                 "enabled": true,
-                "message": "${vessel}: ${key} is ${test} ${threshold}",
+                "message": "${vessel}: ${path} is ${test} ${threshold} (${value})",
                 "thresholds": [{ "notificationtype": "alert" }]
             }],
 			"items": {

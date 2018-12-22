@@ -73,7 +73,7 @@ _${value}_ is the instantaneous value of the monitored path that caused the
 
 _${vessel}_ will be replaced with Signal K's idea of the vessel name.
 
-For examle `${vessel}: waste water tank level is ${test} ${threshold} (currently ${value})`
+For examle `${vessel}: ${path} is ${test} ${threshold} (currently ${value})`
 
 __Thresholds__
 
