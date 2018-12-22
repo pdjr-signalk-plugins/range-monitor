@@ -27,18 +27,18 @@ Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 ![Configuration panel](readme/screenshot.png)
 
-Configuration is simply a matter of maintaining the __Monitored paths__ list
-of Signal K Node server paths which the plugin should monitor and specifying
-the conditons under which notifications should be raised and the attributes
-which should be associated with them.
+Configuration of the plugin is simply a matter of maintaining the list of
+__Monitored paths__ which the plugin should inspect and specifying the
+conditons under which notifications should be raised and the attributes
+of such notifications.
 
 On first use the list of monitored paths will include a single, empty, entry
 which should be completed.
-Additional new monitored paths can be added by clicking the __[+]__ button and
-any existing, unwanted, paths can be deleted by clicking the __[x]__ button,
-both located in the control panel to the right of the list. 
+Additional monitored paths can be added by clicking the __[+]__ button and any
+existing, unwanted, paths can be deleted by clicking the __[x]__ button (both
+buttons are located in the control panel to the right of the list). 
 
-Each monitored path configuration entry consists of the following fields.
+Each monitored path configuration includes the following fields.
 
 __Enabled__  
 Checkbox specifying whether or not the path should be monitored.
@@ -48,19 +48,19 @@ permanently deleting them.
 
 __Signal K path to monitor__  
 The Signal K Node server path which should be monitored.
-There is no default value.
+An entry is required and there is no default value.
 Enter here the full Signal K path for the value which you would like to
 monitor, for example, `tanks.wasteWater.0.currentValue`.
 
 __Notification message__  
 The text of the message which will be issued as part of any notification.
-Default is the empty string.
+Default is a simple message.
 Enter here the text of the message you would like to be issued when the
 monitored path value crosses one of the defined thresholds.
 If any of the following tokens are used they will be interpolated when the
 notification message is composed:
 
-_${vessel}_ will be replaced with Signal K's idea of the vessel name.
+_${path}_ is the value of the _Signal K path to montor_ field.
 
 _${test}_ will be replaced by one of "above", "below" or "between"
 dependant upon the threshold being crossed and the direction of crossing.
@@ -71,18 +71,20 @@ where _n_ is the low threshold and _m_ is the high threshold.
 
 _${value}_ is the instantaneous value of the monitored path that caused the
 
+_${vessel}_ will be replaced with Signal K's idea of the vessel name.
+
 For examle `${vessel}: waste water tank level is ${test} ${threshold} (currently ${value})`
 
 __Thresholds__
 
-This entry consists of a list of one or more threshold specifications each of
-which defines a value threshold value range and the type of notification which
-will be issued if the monitored path value moves into or out of this range.
+Is a list of one or more threshold specifications each of which defines one or
+two thresholds and the type of notification which will be issued if the
+monitored path value moves across a defined threshold.
 Typically, multiple threshold entries can be used to escalate the severity of
 a notification as the monitored path value makes increasingly significant
-excursions beyond one or other threshold. 
+excursions beyond a threshold. 
 
-Each threshold item has the following properties.
+Each threshold specification has the following properties.
 
 __--> Low__  
 If supplied, specifies the lower threshold for raising a notification: if
@@ -102,8 +104,6 @@ __--> Alarm__
 The type of notification to be raised when one or other threshold is
 passed.
 Default is _Alert_.
-
-__--> Request__  
 
 __--> Options__  
 The _audio_ and _visual_ checkboxes allow a suggestion to be made for thes
