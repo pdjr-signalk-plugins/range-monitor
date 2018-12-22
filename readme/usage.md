@@ -4,20 +4,20 @@
 plugin configuration interface.
 Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
-Configuration is simply a matter of maintaining a list of the Signal K Node
-server paths which the plugin should monitor and specifying the conditons
-under which notifications should be raised and the attributes which should be
-associated with them.
-
-On first use the list of monitored paths will be empty.
-A new path can be added by clicking the __[+]__ button which will open an
-empty configuration panel.
-An existing, unwanted path can be deleted by licking the __[x]__ button
-adjacent to the path's configuration panel. 
-
 ![Configuration panel](readme/screenshot.png)
 
-The configuration panel for a monitored path consists of the following fields.
+Configuration is simply a matter of maintaining the __Monitored paths__ list
+of Signal K Node server paths which the plugin should monitor and specifying
+the conditons under which notifications should be raised and the attributes
+which should be associated with them.
+
+On first use the list of monitored paths will include a single, empty, entry
+which should be completed.
+Additional new monitored paths can be added by clicking the __[+]__ button and
+any existing, unwanted, paths can be deleted by clicking the __[x]__ button,
+both located in the control panel to the right of the list. 
+
+Each monitored path configuration entry consists of the following fields.
 
 __Enabled__  
 Checkbox specifying whether or not the path should be monitored.
@@ -52,11 +52,16 @@ _${value}_ is the instantaneous value of the monitored path that caused the
 
 For examle `${vessel}: waste water tank level is ${test} ${threshold} (currently ${value})`
 
-__Threshold__
+__Thresholds__
 
-The _Threshold_ entry specifies one or two thresholds which define a value
-range and the type of notification which will be issued if the monitored
-path value moves into or out of this range.
+This entry consists of a list of one or more threshold specifications each of
+which defines a value threshold value range and the type of notification which
+will be issued if the monitored path value moves into or out of this range.
+Typically, multiple threshold entries can be used to escalate the severity of
+a notification as the monitored path value makes increasingly significant
+excursions beyond one or other threshold. 
+
+Each threshold item has the following properties.
 
 __--> Low__  
 If supplied, specifies the lower threshold for raising a notification: if
@@ -78,12 +83,15 @@ passed.
 Default is _Alert_.
 
 __--> Request__  
-A suggestion for the alert medium to be used when this notification is
-ultimately processed by some notification handler.
-Default is no suggestion.
 
 __--> Options__  
-The _In-range_ option requests that a notification also be issued when the
+The _audio_ and _visual_ checkboxes allow a suggestion to be made for thes
+alert medium to be used when this notification is ultimately processed by
+some notification handler.
+
+The _normal_ option requests that a notification also be issued when the
 monitored path value re-enters the 'between-thresholds' region after
 transiting one or other threshold.
-Default is not to issue the in-range notification.
+
+The defaults are to make no suggestions and not to issue an in-range
+notification.
