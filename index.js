@@ -43,9 +43,9 @@ module.exports = function(app) {
 	plugin.start = function(options) {
         log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
 		unsubscribes = (options.paths || [])
-        .reduce((a, path) => {
-            path.thresholds.forEach(threshold => {
-                a.push({ "enabled": path.enabled, "key": path.path, "message": path.message, "threshold": threshold });
+        .reduce((a, p) => {
+            p.thresholds.forEach(threshold => {
+                a.push({ "enabled": p.enabled, "path": p.path, "message": p.message, "threshold": threshold });
             });
             return(a);
         }, [])
