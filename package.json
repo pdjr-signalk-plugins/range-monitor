@@ -1,7 +1,7 @@
 {
   "name": "signalk-threshold-notifier",
   "version": "1.0.0",
-  "description": "Issue notifications when some value exceeds some thresholds",
+  "description": "Raise notifications based on some path value",
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {},
