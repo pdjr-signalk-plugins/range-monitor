@@ -103,32 +103,32 @@ be issued.
 The default value is undefined which means that there is no upper
 thresold.
 
-__--> Alarm__  
-The type of notification to be raised when one or other threshold is
-passed.
+__--> Notification state__  
+The type of notification to be raised when either threshold is passed.
 Default is _Alert_.
 
 __--> Options__  
-The _audio_ and _visual_ checkboxes allow a suggestion to be made for thes
-alert medium to be used when this notification is ultimately processed by
-some notification handler.
+The _audio_ and _visual_ checkboxes allow a suggestion to be made for the
+method of alert to be used when this notification is ultimately processed by
+some notification handler: making a selection here will not actually cause an
+announcement.
 
 The _normal_ option requests that a notification also be issued when the
 monitored path value re-enters the 'between-thresholds' region after
 transiting one or other threshold.
 
-The defaults are to make no suggestions and not to issue an in-range
+The defaults are to make no method suggestions and not to issue an in-range
 notification.
 ## Messages
 
 __signalk-threshold-notifier__ outputs the following messages to the Signal K
 Node server console and the host system logs.
 
-__Monitoring _n_ path__[__s__]  
-Output when the plugin initialises to report the number, _n_, of Signal K
+__Monitoring *n* path__[__s__]  
+Output when the plugin initialises to report the number, *n*, of Signal K
 paths that are being monitored for threshold transition events.
 
-__Notifying on path__   
+__Notifying on *path*__   
 Output when the plugin issues a threshold transition notification.
 The message on the server console persists for a few seconds before
 the normal status message is restored.

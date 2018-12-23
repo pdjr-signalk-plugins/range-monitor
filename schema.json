@@ -19,8 +19,8 @@
 						"default": true
 					},
 					"path": {
-						"title": "Signal K path to monitor",
-                        "description": "Path referencing the value to monitor.",
+						"title": "Signal K path",
+                        "description": "Path specifying the value which may trigger notification",
 						"type": "string",
 						"default": ""
 					},
@@ -46,7 +46,7 @@
 					            },						
 					            "notificationtype": {
 						            "type": "string",
-						            "title": "Alarm",
+						            "title": "Notification state",
 						            "default": "alert",
 						            "enum": ["normal", "alert", "warn", "alarm", "emergency"],
 						            "enumNames": ["normal", "alert", "warning", "alarm", "emergency"]

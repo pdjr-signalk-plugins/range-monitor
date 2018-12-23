@@ -87,19 +87,20 @@ module.exports = function(app) {
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + path, "value": notificationValue } ] } ] };
 		var vessel = app.getSelfPath("name");
         var threshold = "";
+        var method = notificationoptions.filter(v => ['sound', 'visual'].includes(v));
 
 		if (test != 0) {
 		    test = (test == -1)?"below":"above";
 		    threshold = (test == -1)?lowthreshold:highthreshold;
 		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
-            notificationValue = { "state": notificationtype, "message": message, "method": notificationoptions, "timestamp": date };
+            notificationValue = { "state": notificationtype, "message": message, "method": method, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (notificationoptions.includes("inrange")) {
             test = (lowthreshold === undefined)?"below":((highthreshold === undefined)?"above":"between");
             threshold = (lowthreshold === undefined)?highthreshold:((highthreshold === undefined)?lowthreshold:`${lowthreshold} and ${highthreshold}`);
             message = eval("`" + message + "`");
-            notificationValue = { "state": "normal", "message": message, "method": notificationoptions, "timestamp": date };
+            notificationValue = { "state": "normal", "message": message, "method": method, "timestamp": date };
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		}
