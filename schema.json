@@ -3,65 +3,89 @@
 	"properties": {
 		"paths": {
 			"type": "array",
-			"title": "Monitored paths",
-			"default": [{
-                "enabled": true,
-                "message": "${vessel}: ${path} is ${test} ${threshold} (${value})",
-                "thresholds": [{ "notificationtype": "alert" }]
-            }],
+			"title": "",
 			"items": {
+                "title": "Rule",
 				"type": "object",
-				"required": ["path"],
 				"properties": {
-					"enabled": {
-						"title": "Enabled",
-						"type": "boolean",
-						"default": true
-					},
 					"path": {
-						"title": "Signal K path",
-                        "description": "Path specifying the value which may trigger notification",
-						"type": "string",
-						"default": ""
+						"title": "Monitored path",
+						"type": "string"
 					},
-					"message": {
-						"title": "Notification message",
-						"description": "Text of notification. Use ${path}, ${test}, ${threshold}, ${value} or ${vessel} to interpolate values.",
-						"type": "string",
-                        "default": ""
-					},
-                    "thresholds": {
-                        "title": "Thresholds",
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-					            "lowthreshold": {
-						            "title": "Low",
-						            "type": "number"
-					            },						
-					            "highthreshold": {
-						            "title": "High",
-						            "type": "number"
-					            },						
-					            "notificationtype": {
-						            "type": "string",
-						            "title": "Notification state",
-						            "default": "alert",
-						            "enum": ["normal", "alert", "warn", "alarm", "emergency"],
-						            "enumNames": ["normal", "alert", "warning", "alarm", "emergency"]
-					            },
-                                "notificationoptions": {
-                                    "title": "Options",
-                                    "type": "array",
-                                    "default": [],
-                                    "items": {
-                                        "type": "string",
-                                        "enum": [ "visual", "sound", "inrange" ],
-                                        "enumNames": [ "visual", "sound", "normal" ]
-                                    },
-                                    "uniqueItems": true
-                                }
+				    "message": {
+				        "title": "Notification message",
+				        "type": "string",
+                        "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+				    },
+                    "lowthreshold": {
+                        "title": "",
+                        "type": "object",
+                        "properties": {
+					        "value": {
+					            "title": "Low threshold",
+					            "type": "number"
+					        },						
+				            "state": {
+				                "title": "Alarm state",
+				                "type": "string",
+                                "default": "alert",
+				                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+				            },
+                            "method": {
+                                "title": "Suggested method",
+                                "type": "array",
+                                "default": [],
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "visual", "sound" ]
+                                },
+                                "uniqueItems": true
+                            },
+                            "options": {
+                                "title": "Options",
+                                "type": "array",
+                                "default": [],
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "two-way" ]
+                                },
+                                "uniqueItems": true
+                            }
+                        }
+                    },
+                    "highthreshold": {
+                        "title": "",
+                        "type": "object",
+                        "properties": {
+					        "value": {
+							    "title": "High threshold",
+							    "type": "number"
+							},						
+						    "state": {
+						        "title": "Alarm state",
+						        "type": "string",
+		                        "default": "alert",
+						        "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+						    },
+		                    "method": {
+		                        "title": "Suggested method",
+		                        "type": "array",
+		                        "default": [],
+		                        "items": {
+		                            "type": "string",
+		                            "enum": [ "visual", "sound" ]
+		                        },
+		                        "uniqueItems": true
+		                    },
+		                    "options": {
+                                "title": "Options",
+                                "type": "array",
+                                "default": [],
+                                "items": {
+                                    "type": "string",
+                                    "enum": [ "two-way" ]
+                                },
+                                "uniqueItems": true
                             }
                         }
                     }

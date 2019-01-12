@@ -1,26 +1,62 @@
 {
     "paths": {
         "items": {
-            "request": {
-                "ui:widget": {
-                    "component": "checkboxes",
-                    "options": {
-                        "inline": true
+            "path": {
+                "classNames": "col-sm-5",
+                "classNames": ""
+            },
+            "message": {
+                "classNames": "col-sm-7",
+                "classNames": ""
+            },
+            "lowthreshold": {
+                "value": {
+                    "classNames": "col-sm-3"
+                },
+                "state": {
+                    "classNames": "col-sm-3"
+                },
+                "method": {
+                    "classNames": "col-sm-3",
+                    "ui:widget": {
+                        "component": "checkboxes",
+                        "options": {
+                            "inline": true
+                        }
+                    }
+                },
+                "options": {
+                    "classNames": "col-sm-3",
+                    "ui:widget": {
+                        "component": "checkboxes",
+                        "options": {
+                            "inline": true
+                        }
                     }
                 }
             },
-            "thresholds": {
-                "items": {
-                    "lowthreshold": { "classNames": "col-sm-3" },
-                    "highthreshold": { "classNames": "col-sm-3" },
-                    "notificationtype": { "classNames": "col-sm-4" },
-                    "notificationoptions": {
-                        "classNames": "col-sm-2",
-                        "ui:widget": {
-                            "component": "checkboxes",
-                            "options": {
-                                "inline": false
-                            }
+            "highthreshold": {
+                "value": {
+                    "classNames": "col-sm-3"
+                },
+                "state": {
+                    "classNames": "col-sm-3"
+                },
+                "method": {
+                    "classNames": "col-sm-3",
+                    "ui:widget": {
+                        "component": "checkboxes",
+                        "options": {
+                            "inline": true
+                        }
+                    }
+                },
+                "options": {
+                    "classNames": "col-sm-3",
+                    "ui:widget": {
+                        "component": "checkboxes",
+                        "options": {
+                            "inline": true
                         }
                     }
                 }
