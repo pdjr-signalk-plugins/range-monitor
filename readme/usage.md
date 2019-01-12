@@ -8,17 +8,18 @@ Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 Configuration of the plugin is a matter of maintaining the list of _Rule_s
 which define the plugin's action.
-Each rule specifies the Signal K paths which sould be monitored, the values
+
+Each rule specifies a Signal K paths which should be monitored, the values
 which define the thresholds against which notifications should be raised and
 the attributes of such notifications.
 
 On first use the list of monitored paths will include a single, empty, entry
 which should be completed.
-Additional _Rule_s can be added by clicking the __[+]__ button and any
-existing, unwanted, _Rule_s can be deleted by clicking the __[x]__ buttons,
-both located in the control panel to the right of the list. 
+Additional rules can be added by clicking the __[+]__ button and any existing,
+unwanted, rules can be deleted by clicking the __[x]__ buttons, both located
+in the control panel to the right of the list. 
 
-Each _Rule_ includes the following fields.
+Each rule includes the following fields.
 
 __Monitored path__  
 The Signal K Node server path which should be monitored.
