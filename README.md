@@ -106,7 +106,7 @@ and the chosen state could have significance elsewhere: an example is the
 __signalk-switchbank__ plugin which treats "normal" and non-"normal" alarm
 states as binary switch signals.
 
-__Suggested method__
+__Suggested method__  
 An optional value which will be assigned to the notification _method_ property
 which is used to suggest to downstream notification handlers a preference for
 how a displayed alert might be handled.
