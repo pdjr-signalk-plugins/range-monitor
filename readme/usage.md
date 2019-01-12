@@ -22,55 +22,82 @@ in the control panel to the right of the list.
 Each rule includes the following fields.
 
 __Monitored path__  
-The Signal K Node server path which should be monitored.
-An entry is required and there is no default value.
+A required text value which specifies the Signal K Node server path which
+should be monitored.
+There is no default value.
+
 Enter here the full Signal K path for the value which you would like to
 monitor, for example, `tanks.wasteWater.0.currentValue`.
 
 __Notification message__  
-The text of the message which will be issued as part of any notification.
-Default is a simple message.
+An optional text message which will be assigned to the message property of
+any issued notification.
+The default value is a simple message.
+
 Enter here the text of the message you would like to be issued when the
 monitored path value crosses one of the defined thresholds.
-If any of the following tokens are used they will be interpolated when the
-notification message is composed:
+If the option is left blank then the plugin will insert an automatically
+generated identifying text when it issues a notification.
 
-_${path}_ is the value of the _Monitored path_ field.
+Any of the following tokens may be used in the supplied message text and will
+be interpolated with the described value when the notification message is
+composed.
 
-_${test}_ will be replaced by one of "above", "below" or "between"
-dependant upon the threshold being crossed and the direction of crossing.
+_${path}_ will be replaced by the value of the _Monitored path_ option.
 
-_${threshold}_ will be replaced with the value of the threshold or, in the
-case of the path value being between thresholds with the string "_n_ and _m_"
-where _n_ is the low threshold and _m_ is the high threshold.
+_${test}_ will be replaced by one of "above", "below" or "between" dependant
+upon the threshold being crossed and the direction of crossing.
 
-_${value}_ is the instantaneous value of the monitored path that triggered
-the rule.
+_${threshold}_ will be replaced with the value of the threshold triggering the
+rule or, in the case of the path value being between thresholds with the
+string "_n_ and _m_" where _n_ is the low threshold and _m_ is the high
+threshold.
+
+_${value}_ will be replaced with the instantaneous value of the monitored path
+that triggered the rule.
 
 _${vessel}_ will be replaced with Signal K's idea of the vessel name.
 
-For examle `${vessel}: ${path} is ${test} ${threshold} (currently ${value})`
+An example message text might be "${vessel}: ${path} is ${test} ${threshold} (currently ${value})".
 
-__Low threshold__ 
-If supplied, a numerical value which sets a lower threshold.
-If the path value falls below this value then a notification of the type
-specified by the associated options will be issued.
-Depending upon option settings, a notification may also be issued when the
-path value returns above the threshold.
+__Low threshold__  
+An optional numerical value which sets the lower threshold against which the
+monitored path value will be compared.
+The default value is a blank entry which disables monitoring of the
+low-threshold.
 
-__Alarm state__
-When a notification is issued, the notification _state_ property will be set
-to the chosen level.
-Default is to set the notification state to "alert".
+If a value is supplied and the path value falls below this threshold then a
+notification of the type specified by the associated options will be issued.
+If the 'two-way' option is set, then a notification will again be issued when
+the monitored value returns above this threshold.
+
+__Alarm state__  
+A required value which will be assigned to the notification _state_ property
+which is used to signal the severity of the notification.
+Default is to set the alarm state to "alert".
+
+Choose a value appropriate to the notification event.
+Remember that notifications in Signal K may be processed by downstream handlers
+and the chosen state could have significance elsewhere: an example is the
+__signalk-switchbank__ plugin which treats "normal" and non-"normal" alarm
+states as binary switch signals.
 
 __Suggested method__
-When a notification is issued, the notification _method_ property will be
-set to any selected value.
-Default is to not suggest a notification method.
+An optional value which will be assigned to the notification _method_ property
+which is used to suggest to downstream notification handlers a preference for
+how a displayed alert might be handled.
+Default is to express no preference.
+
+Choose a value which you think appropriate, or none at all.
 
 __Options__  
 
-The _two-way_ option causes a notification with state "normal" to be issued
-when the path value returns above the specified threshold.
+_==> two-way_ causes a notification to be issued when the monitored path value
+returns above the specified threshold.
+A notification issued in this way always has its _state_ property set to
+"normal".
 
-A __High threshold__ can be defined in a similar way.
+The cluster of options associate with defining a high threshold have similar
+semantics to those described above: the __High threshold__ option itself,
+naturally, defines an upper threshold against which the monitored path value
+will be tested for a low->high transition.
