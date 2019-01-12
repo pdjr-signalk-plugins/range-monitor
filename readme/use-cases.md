@@ -43,7 +43,7 @@ Suggested method:       sound
 Options:                (none)
 Low threshold:          0.01
 Alarm state:            normal
-Suggested method:       sound
+Suggested method:       (none)
 Options:                (none)
 ```
 My in-for-a-penny, in-for-a-pound approach means that I aim to start the

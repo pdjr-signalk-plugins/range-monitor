@@ -30,10 +30,10 @@ Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 ![Configuration panel](readme/config.png)
 
-Configuration of the plugin is a matter of maintaining the list of _Rule_s
-which define the plugin's action.
+Configuration of the plugin is a matter of maintaining the list of rules which
+define the plugin's action.
 
-Each rule specifies a Signal K paths which should be monitored, the values
+Each rule specifies a Signal K path which should be monitored, the values
 which define the thresholds against which notifications should be raised and
 the attributes of such notifications.
 
@@ -56,12 +56,12 @@ monitor, for example, `tanks.wasteWater.0.currentValue`.
 __Notification message__  
 An optional text message which will be assigned to the message property of
 any issued notification.
-The default value is a simple message.
+The default value is a simple, automatically generated, message.
 
 Enter here the text of the message you would like to be issued when the
 monitored path value crosses one of the defined thresholds.
-If the option is left blank then the plugin will insert an automatically
-generated identifying text when it issues a notification.
+If the option is left blank then the plugin will insert just the monitored
+path text as an identifier when it raises a notification.
 
 Any of the following tokens may be used in the supplied message text and will
 be interpolated with the described value when the notification message is
@@ -121,10 +121,10 @@ returns above the specified threshold.
 A notification issued in this way always has its _state_ property set to
 "normal".
 
-The cluster of options associate with defining a high threshold have similar
+The cluster of options associated with defining a high threshold have similar
 semantics to those described above: the __High threshold__ option itself,
 naturally, defines an upper threshold against which the monitored path value
-will be tested for a low->high transition.
+will be tested for a low-to-high transition.
 ## Use cases
 
 __1.  Issuing a notification when a tank level approaches full__
@@ -170,7 +170,7 @@ Suggested method:       sound
 Options:                (none)
 Low threshold:          0.01
 Alarm state:            normal
-Suggested method:       sound
+Suggested method:       (none)
 Options:                (none)
 ```
 My in-for-a-penny, in-for-a-pound approach means that I aim to start the
