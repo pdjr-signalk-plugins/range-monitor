@@ -69,7 +69,7 @@ module.exports = function(app) {
             }
             return(a);
         }, [])
-        .reduce((acc, {
+        .map(({
             path,
             message,
             type,
@@ -77,12 +77,12 @@ module.exports = function(app) {
             highthreshold
         }) => {
 			var stream = app.streambundle.getSelfStream(path)
-			acc.push(stream.map(value => {
+			return(stream.map(value => {
                 if (lowthreshold) lowthreshold['actual'] = value;
                 if (highthreshold) highthreshold['actual'] = value;
 			    if ((type == "lowthreshold") && (value < lowthreshold.value)) {
 					return(-1);
-				} else if ((type = "highthreshold") && (value > highthreshold.value)) {
+				} else if ((type == "highthreshold") && (value > highthreshold.value)) {
 					return(1);
 				} else {
 					return(0);
@@ -90,9 +90,7 @@ module.exports = function(app) {
 			}).skipDuplicates().onValue(test => {
 				sendNotificationUpdate(test, path, message, type, lowthreshold, highthreshold);
 			}));
-			return(acc);
-		}, [])
-		return(true);
+		});
 	}
 
 	plugin.stop = function() {
@@ -101,7 +99,6 @@ module.exports = function(app) {
 	}
 
 	function sendNotificationUpdate(test, path, message, type, lowthreshold, highthreshold) {
-        console.log("sendNotificationUpdate(%d,%s,%s,%s,%s)...", test, path, message, type, JSON.stringify(lowthreshold), JSON.stringify(highthreshold));
         var notificationValue = null;
         var date = (new Date()).toISOString();
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + path, "value": notificationValue } ] } ] };
@@ -112,11 +109,12 @@ module.exports = function(app) {
         var value = (type == "lowthreshold")?lowthreshold.actual:highthreshold.actual;
         var testzero = ((type == "lowthreshold") && lowthreshold.options.includes("two-way")) || ((type == "highthreshold") && highthreshold.options.includes("two-way"));
 
-        log.N(`issuing ${state} notification on ${path}`);
 		if (test != 0) {
 		    test = (test == -1)?"below":"above";
+		    switching = (test == "below")?"stopping":"starting";
 		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
             notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
+            log.N(JSON.stringify(notificationValue));
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (testzero) {
@@ -124,6 +122,7 @@ module.exports = function(app) {
             threshold = ((lowthreshold !== undefined) && (highthreshold !== undefined))?`${lowthreshold.value} and ${highthreshold.value}`:threshold;
             message = eval("`" + message + "`");
             notificationValue = { "state": "normal", "message": message, "method": method, "timestamp": date };
+            log.N(JSON.stringify(notificationValue));
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		}
