@@ -213,3 +213,6 @@ Configuration files created by __signalk-threshold-notifier__ version 1.0.0
 are not compatible with this release, but manual conversion to the new
 format is trivial.
 
+### 2.0.1
+
+Corrects publising error in 2.0.0 schema.json and uischema.json.
