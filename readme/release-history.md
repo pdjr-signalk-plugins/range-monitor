@@ -1,4 +1,4 @@
-## Version history
+## Release history
 
 ### 1.0.0
 
@@ -12,6 +12,7 @@ This change allows the plugin to support the notification based switching
 strategy implemented by
 [signalk-switchbank](https://github.com/preeve9534/signalk-switchbank).
 
-Version 1.0.0 schema files are not compatible with this release, but manual
-conversion to the new format is trivial.
+Configuration files areted by __signalk-threshold-notifier__ version 1.0.0
+are not compatible with this release, but manual conversion to the new
+format is trivial.
 

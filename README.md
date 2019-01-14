@@ -189,13 +189,13 @@ paths that are being monitored for threshold transition events.
 Additionally, the following messages are output just to the system logging
 facility.
 
-__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *date* }__
+__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *date* }__  
 Output when a montored value transits a threshold and a notification is about
 to be issued.
 *state* is set to the notification state (e.g. "alarm", "warning", and so on),
 *message* to the text of the notification message, *method* to any requested
 notification methods and *date* to the date and time of notification.
-## Version history
+## Release history
 
 ### 1.0.0
 
@@ -209,6 +209,7 @@ This change allows the plugin to support the notification based switching
 strategy implemented by
 [signalk-switchbank](https://github.com/preeve9534/signalk-switchbank).
 
-Version 1.0.0 schema files are not compatible with this release, but manual
-conversion to the new format is trivial.
+Configuration files areted by __signalk-threshold-notifier__ version 1.0.0
+are not compatible with this release, but manual conversion to the new
+format is trivial.
 

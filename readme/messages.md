@@ -10,7 +10,7 @@ paths that are being monitored for threshold transition events.
 Additionally, the following messages are output just to the system logging
 facility.
 
-__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *date* }__
+__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *date* }__  
 Output when a montored value transits a threshold and a notification is about
 to be issued.
 *state* is set to the notification state (e.g. "alarm", "warning", and so on),
