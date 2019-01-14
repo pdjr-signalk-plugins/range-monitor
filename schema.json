@@ -1,15 +1,12 @@
 {
 	"type": "object",
 	"properties": {
-        "version": "2.0.0",
 		"paths": {
 			"type": "array",
 			"title": "",
-            "default": [ {} ],
 			"items": {
                 "title": "Rule",
 				"type": "object",
-                "required": [ "path" ],
 				"properties": {
 					"path": {
 						"title": "Monitored path",

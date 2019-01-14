@@ -33,7 +33,9 @@ module.exports = function(app) {
     const log = new Log(app.setProviderStatus, app.setProviderError, plugin.id);
 
 	plugin.schema = function() {
-        return(Schema.createSchema(PLUGIN_SCHEMA_FILE).getSchema());
+        var schema = Schema.createSchema(PLUGIN_SCHEMA_FILE).getSchema();
+        console.log(JSON.stringify(schema));
+        return(schema);
 	}
 
 	plugin.uiSchema = function() {
