@@ -114,7 +114,7 @@ module.exports = function(app) {
 		    switching = (test == "below")?"stopping":"starting";
 		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
             notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
-            log.N(JSON.stringify(notificationValue));
+            log.N(JSON.stringify(notificationValue), false);
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (testzero) {
@@ -122,7 +122,7 @@ module.exports = function(app) {
             threshold = (lowthreshold && highthreshold)?`${lowthreshold.value} and ${highthreshold.value}`:threshold;
             message = eval("`" + message + "`");
             notificationValue = { "state": "normal", "message": message, "method": method, "timestamp": date };
-            log.N(JSON.stringify(notificationValue));
+            log.N(JSON.stringify(notificationValue), false);
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		}
