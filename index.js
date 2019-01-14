@@ -119,7 +119,7 @@ module.exports = function(app) {
 		    app.handleMessage(plugin.id, delta);
 		} else if (testzero) {
             test = (lowthreshold && highthreshold)?"between":((lowthreshold)?"below":"above");
-            threshold = ((lowthreshold !== undefined) && (highthreshold !== undefined))?`${lowthreshold.value} and ${highthreshold.value}`:threshold;
+            threshold = (lowthreshold && highthreshold)?`${lowthreshold.value} and ${highthreshold.value}`:threshold;
             message = eval("`" + message + "`");
             notificationValue = { "state": "normal", "message": message, "method": method, "timestamp": date };
             log.N(JSON.stringify(notificationValue));
