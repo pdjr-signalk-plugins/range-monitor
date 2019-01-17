@@ -30,10 +30,9 @@ Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 ![Configuration panel](readme/config.png)
 
-The plugin configuration consists of a, possibly empty, list of rules each of
-which specifies a Signal K path value which should be monitored, upper and
-lower limits against which notifications should be raised and the attributes
-of such notifications.
+The plugin configuration consists of a list of rules, each of which specifies
+a Signal K path which should be monitored, upper and lower limits against
+which notifications should be raised and the attributes of such notifications.
 On first use the list of monitored paths will be empty.
 
 New rules can be added by clicking the __[+]__ button and any existing,
@@ -175,22 +174,22 @@ the level falls below 1%.
 
 ## Messages
 
-__signalk-threshold-notifier__ outputs the following messages to the Signal K
+__signalk-threshold-notifier__ outputs the following message to the Signal K
 Node server console and system logging facility.
 
 __Monitoring *n* path__[__s__]  
 Output when the plugin initialises to report the number, *n*, of Signal K
 paths that are being monitored for threshold transition events.
 
-Additionally, the following messages are output just to the system logging
+Additionally, the following message is output just to the system logging
 facility.
 
-__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *date* }__  
+__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *timestamp* }__  
 Output when a montored value transits a threshold and a notification is about
 to be issued.
 *state* is set to the notification state (e.g. "alarm", "warning", and so on),
 *message* to the text of the notification message, *method* to any requested
-notification methods and *date* to the date and time of notification.
+notification methods and *timestamp* to the date and time of notification.
 ## Release history
 
 ### 1.0.0

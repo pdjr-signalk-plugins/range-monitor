@@ -6,10 +6,9 @@ Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
 
 ![Configuration panel](readme/config.png)
 
-The plugin configuration consists of a, possibly empty, list of rules each of
-which specifies a Signal K path value which should be monitored, upper and
-lower limits against which notifications should be raised and the attributes
-of such notifications.
+The plugin configuration consists of a list of rules, each of which specifies
+a Signal K path which should be monitored, upper and lower limits against
+which notifications should be raised and the attributes of such notifications.
 On first use the list of monitored paths will be empty.
 
 New rules can be added by clicking the __[+]__ button and any existing,
