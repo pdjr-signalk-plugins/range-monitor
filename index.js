@@ -28,7 +28,7 @@ module.exports = function(app) {
 
 	plugin.id = "threshold-notifier";
 	plugin.name = "Threshold notifier";
-	plugin.description = "Issue notifications when some value exceeds some thresholds.";
+	plugin.description = "Issue notifications when a path value goes outside defined limits.";
 
     const log = new Log(app.setProviderStatus, app.setProviderError, plugin.id);
 
@@ -40,6 +40,10 @@ module.exports = function(app) {
         return(Schema.createSchema(PLUGIN_UISCHEMA_FILE).getSchema());
 	}
 
+    // Expand the path list by splitting each definition into separate low and
+    // high components before mapping these into sensor streams which are then
+    // monitored for value changes.
+    //  
 	plugin.start = function(options) {
         log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
 		unsubscribes = (options.paths || [])
@@ -88,7 +92,8 @@ module.exports = function(app) {
 					return(0);
 				}
 			}).skipDuplicates().onValue(test => {
-				sendNotificationUpdate(test, path, message, type, lowthreshold, highthreshold);
+				var notificationValue = sendNotificationUpdate(test, path, message, type, lowthreshold, highthreshold);
+                if (notificationValue !== null) log.N(JSON.stringify(notificationValue), false);
 			}));
 		});
 	}
@@ -114,7 +119,6 @@ module.exports = function(app) {
 		    switching = (test == "below")?"stopping":"starting";
 		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
             notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
-            log.N(JSON.stringify(notificationValue), false);
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		} else if (testzero) {
@@ -122,10 +126,10 @@ module.exports = function(app) {
             threshold = (lowthreshold && highthreshold)?`${lowthreshold.value} and ${highthreshold.value}`:threshold;
             message = eval("`" + message + "`");
             notificationValue = { "state": "normal", "message": message, "method": method, "timestamp": date };
-            log.N(JSON.stringify(notificationValue), false);
             delta.updates[0].values[0].value = notificationValue;
 		    app.handleMessage(plugin.id, delta);
 		}
+        return(notificationValue);
 	}
 
 	return(plugin);
