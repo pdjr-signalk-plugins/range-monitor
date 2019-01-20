@@ -13,6 +13,17 @@
 						"title": "Monitored path",
 						"type": "string"
 					},
+                    "options": {
+                        "title": "Options",
+                        "type": "array",
+                        "default": [ "enabled" ],
+                        "items": {
+                            "type": "string",
+                            "enum": [ "enabled" ],
+                            "enumNames": [ "Enabled?" ]
+                        },
+                        "uniqueItems": true
+                    },
 				    "message": {
 				        "title": "Notification message",
 				        "type": "string",
@@ -38,17 +49,7 @@
                                 "default": [],
                                 "items": {
                                     "type": "string",
-                                    "enum": [ "visual", "sound" ]
-                                },
-                                "uniqueItems": true
-                            },
-                            "options": {
-                                "title": "Options",
-                                "type": "array",
-                                "default": [],
-                                "items": {
-                                    "type": "string",
-                                    "enum": [ "two-way" ]
+                                    "enum": [ "visual", "sound", "control" ]
                                 },
                                 "uniqueItems": true
                             }
@@ -74,20 +75,10 @@
 		                        "default": [],
 		                        "items": {
 		                            "type": "string",
-		                            "enum": [ "visual", "sound" ]
+		                            "enum": [ "visual", "sound", "control" ]
 		                        },
 		                        "uniqueItems": true
-		                    },
-		                    "options": {
-                                "title": "Options",
-                                "type": "array",
-                                "default": [],
-                                "items": {
-                                    "type": "string",
-                                    "enum": [ "two-way" ]
-                                },
-                                "uniqueItems": true
-                            }
+		                    }
                         }
                     }
                 }

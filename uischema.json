@@ -2,14 +2,22 @@
     "paths": {
         "items": {
             "path": {
-                "classNames": "col-sm-5",
-                "classNames": ""
+                "classNames": "col-sm-10"
             },
+            "options": {
+                "classNames": "col-sm-2",
+                "ui:widget": {
+                    "component": "checkboxes",
+                    "options": {
+                        "inline": true
+                    }
+                }
+            }, 
             "message": {
-                "classNames": "col-sm-7",
-                "classNames": ""
+                "classNames": "col-sm-12"
             },
             "lowthreshold": {
+                "classNames": "col-sm-12",
                 "value": {
                     "classNames": "col-sm-3"
                 },
@@ -17,16 +25,7 @@
                     "classNames": "col-sm-3"
                 },
                 "method": {
-                    "classNames": "col-sm-3",
-                    "ui:widget": {
-                        "component": "checkboxes",
-                        "options": {
-                            "inline": true
-                        }
-                    }
-                },
-                "options": {
-                    "classNames": "col-sm-3",
+                    "classNames": "col-sm-6",
                     "ui:widget": {
                         "component": "checkboxes",
                         "options": {
@@ -36,6 +35,7 @@
                 }
             },
             "highthreshold": {
+                "classNames": "col-sm-12",
                 "value": {
                     "classNames": "col-sm-3"
                 },
@@ -43,16 +43,7 @@
                     "classNames": "col-sm-3"
                 },
                 "method": {
-                    "classNames": "col-sm-3",
-                    "ui:widget": {
-                        "component": "checkboxes",
-                        "options": {
-                            "inline": true
-                        }
-                    }
-                },
-                "options": {
-                    "classNames": "col-sm-3",
+                    "classNames": "col-sm-6",
                     "ui:widget": {
                         "component": "checkboxes",
                         "options": {
