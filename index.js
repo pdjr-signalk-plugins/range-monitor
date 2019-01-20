@@ -40,9 +40,11 @@ module.exports = function(app) {
         return(Schema.createSchema(PLUGIN_UISCHEMA_FILE).getSchema());
 	}
 
-    // Expand the path list by splitting each definition into separate low and
-    // high components before mapping these into sensor streams which are then
-    // monitored for value changes.
+    // Filter out rules which are disabled and map monitored path values into
+    // a stream of comparator values where -1 = below low threshold, 1 = above
+    // high threshold and 0 = between threshold.  Eliminate duplicate values
+    // in this new stream and issue a notification based upon the resulting
+    // comparator.  
     //  
 	plugin.start = function(options) {
         log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
@@ -66,7 +68,7 @@ module.exports = function(app) {
                         return(0);
                     }
 			    }).skipDuplicates().onValue(test => {
-			        var notification = sendNotificationUpdate(test, path, message, lowthreshold, highthreshold);
+			        var notification = issueNotificationUpdate(test, path, message, lowthreshold, highthreshold);
                     if (notification == null) {
                         log.N("cancelling notification on '" + path + "'", false);
                     } else if (notification !== undefined) {
@@ -83,7 +85,7 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-	function sendNotificationUpdate(test, path, message, lowthreshold, highthreshold) {
+	function issueNotificationUpdate(test, path, message, lowthreshold, highthreshold) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
 		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + path, "value": notificationValue } ] } ] };
