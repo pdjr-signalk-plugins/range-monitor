@@ -47,7 +47,7 @@ module.exports = function(app) {
     // comparator.  
     //  
 	plugin.start = function(options) {
-        log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"), 5000);
+        if (options.paths !== undefined) log.N("monitoring " + options.paths.length + " path(s)");
 		unsubscribes = (options.paths || [])
         .reduce((a, {
             path,

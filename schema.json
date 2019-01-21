@@ -16,7 +16,7 @@
                     "options": {
                         "title": "Options",
                         "type": "array",
-                        "default": [ "enabled", "prefix" ],
+                        "default": [ "enabled" ],
                         "items": {
                             "type": "string",
                             "enum": [ "enabled" ],
