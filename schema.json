@@ -16,7 +16,7 @@
                     "options": {
                         "title": "Options",
                         "type": "array",
-                        "default": [ "enabled" ],
+                        "default": [ "enabled", "prefix" ],
                         "items": {
                             "type": "string",
                             "enum": [ "enabled" ],
@@ -29,6 +29,12 @@
 				        "type": "string",
                         "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
 				    },
+                    "prefix": {
+                        "title": "Path prefix",
+                        "type": "string",
+                        "enum": [ "none", "control." ],
+                        "default": "none"
+                    },
                     "lowthreshold": {
                         "title": "",
                         "type": "object",
@@ -49,7 +55,7 @@
                                 "default": [],
                                 "items": {
                                     "type": "string",
-                                    "enum": [ "visual", "sound", "control" ]
+                                    "enum": [ "visual", "sound" ]
                                 },
                                 "uniqueItems": true
                             }
@@ -75,7 +81,7 @@
 		                        "default": [],
 		                        "items": {
 		                            "type": "string",
-		                            "enum": [ "visual", "sound", "control" ]
+		                            "enum": [ "visual", "sound" ]
 		                        },
 		                        "uniqueItems": true
 		                    }

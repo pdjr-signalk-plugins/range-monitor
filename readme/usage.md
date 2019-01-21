@@ -59,6 +59,14 @@ _${vessel}_ will be replaced with Signal K's idea of the vessel name.
 
 An example message text might be "${vessel}: ${path} is ${test} ${threshold} (currently ${value})".
 
+__Path prefix__  
+A notification path component which will be inserted after the "notifications."
+root and before the value of _Monitored path_.
+This allows semantic classification of notifications and supports overlapping
+notifications on the same monitored path.
+Default is "none" which places notifications directly under the "notifications."
+root. 
+
 __Low threshold__  
 An optional numerical value which sets the lower threshold against which the
 monitored path value will be compared.

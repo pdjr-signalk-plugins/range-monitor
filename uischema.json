@@ -14,7 +14,10 @@
                 }
             }, 
             "message": {
-                "classNames": "col-sm-12"
+                "classNames": "col-sm-10"
+            },
+            "prefix": {
+                "classNames": "col-sm-2"
             },
             "lowthreshold": {
                 "classNames": "col-sm-12",

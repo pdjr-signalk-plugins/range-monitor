@@ -53,6 +53,7 @@ module.exports = function(app) {
             path,
             options,
             message,
+            prefix,
             lowthreshold,
             highthreshold
         }) => {
@@ -68,11 +69,11 @@ module.exports = function(app) {
                         return(0);
                     }
 			    }).skipDuplicates().onValue(test => {
-			        var notification = issueNotificationUpdate(test, path, message, lowthreshold, highthreshold);
-                    if (notification == null) {
-                        log.N("cancelling notification on '" + path + "'", false);
-                    } else if (notification !== undefined) {
-                        log.N("issuing notification '" + JSON.stringify(notification), false);
+			        var [ nPath, nValue ] = issueNotificationUpdate(test, path, message, (prefix == "none")?"":prefix, lowthreshold, highthreshold);
+                    if (test == 0) {
+                        log.N("cancelling notification on '" + nPath + "'", false);
+                    } else if (nValue !== undefined) {
+                        log.N("issuing '" + nValue['state'] + "' notification on '" + nPath, false);
                     }
 			    }));
             }
@@ -85,10 +86,11 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-	function issueNotificationUpdate(test, path, message, lowthreshold, highthreshold) {
+	function issueNotificationUpdate(test, path, message, prefix, lowthreshold, highthreshold) {
+        var notificationPath = "notifications." + prefix + path;
         var notificationValue = null;
         var date = (new Date()).toISOString();
-		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": "notifications." + path, "value": notificationValue } ] } ] };
+		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": notificationPath, "value": notificationValue } ] } ] };
 		var vessel = app.getSelfPath("name");
 
 		if (test != 0) {
@@ -103,7 +105,7 @@ module.exports = function(app) {
 		}
         delta.updates[0].values[0].value = notificationValue;
 		app.handleMessage(plugin.id, delta);
-        return(notificationValue);
+        return([ notificationPath, notificationValue ]);
 	}
 
 	return(plugin);
