@@ -1,18 +1,18 @@
 ## Messages
 
-__signalk-threshold-notifier__ outputs the following message to the Signal K
+__signalk-threshold-notifier__ issues the following message to the Signal K
 Node server console and system logging facility.
 
 __Monitoring *n* path__[__s__]  
-Output when the plugin initialises to report the number, *n*, of Signal K
-paths that are being monitored for threshold transition events.
+The plugin has initialised and is monitoring *n* Signal K paths.
 
-Additionally, the following message is output just to the system logging
+Additionally, the following messages are issued just to the system logging
 facility.
 
-__{ "state": *state*, "message": *message*, "method": *method*, "timestamp": *timestamp* }__  
-Output when a montored value transits a threshold and a notification is about
-to be issued.
-*state* is set to the notification state (e.g. "alarm", "warning", and so on),
-*message* to the text of the notification message, *method* to any requested
-notification methods and *timestamp* to the date and time of notification.
+__cancelling notification on '*path*'__  
+The monitored value has returned between the low and high thresholds and the
+notification on _path_ is being removed. 
+
+__issuing '*state*' notification on '*path*'__  
+The monitored value has passed a threshold and a notification of type *state*
+has been issued on *path*.

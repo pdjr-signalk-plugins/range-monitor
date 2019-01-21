@@ -41,7 +41,7 @@ The configuration file snippet for the rule I use looks like this:
         "state": "alert",
         "method": [ ]
     },
-        "lowthreshold": {
+    "lowthreshold": {
         "value": 0.01,
         "state": "normal",
         "method": [ ]
