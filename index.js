@@ -47,7 +47,7 @@ module.exports = function(app) {
     // comparator.  
     //  
 	plugin.start = function(options) {
-        if (options.paths !== undefined) log.N("monitoring " + options.paths.length + " path(s)");
+        if (options.paths !== undefined) log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"));
 		unsubscribes = (options.paths || [])
         .reduce((a, {
             path,
@@ -60,7 +60,8 @@ module.exports = function(app) {
             if (options.includes("enabled")) { 
 			    var stream = app.streambundle.getSelfStream(path)
 			    a.push(stream.map(value => {
-                    lowthreshold['actual'] = highthreshold['actual'] = value;
+                    if (lowthreshold) lowthreshold['actual'] = value;
+                    if (highthreshold) highthreshold['actual'] = value;
 			        if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold.value)) {
                         return(-1);
 				    } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold.value)) {
