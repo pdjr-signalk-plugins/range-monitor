@@ -21,6 +21,7 @@ const Log = require('./lib/log.js');
 
 const PLUGIN_SCHEMA_FILE = __dirname + "/schema.json";
 const PLUGIN_UISCHEMA_FILE = __dirname + "/uischema.json";
+const NOTIFICATION_PREFIX = "notifications.";
 
 module.exports = function(app) {
 	var plugin = {};
@@ -60,21 +61,28 @@ module.exports = function(app) {
             if (options.includes("enabled")) { 
 			    var stream = app.streambundle.getSelfStream(path)
 			    a.push(stream.map(value => {
+                    var retval = 0;
                     if (lowthreshold) lowthreshold['actual'] = value;
                     if (highthreshold) highthreshold['actual'] = value;
 			        if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold.value)) {
-                        return(-1);
+                        retval = -1;
 				    } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold.value)) {
-                        return(1);
-				    } else {
-                        return(0);
-                    }
+                        retval = 1;
+				    }
+                    return(retval);
 			    }).skipDuplicates().onValue(test => {
-			        var [ nPath, nValue ] = issueNotificationUpdate(test, path, message, (prefix == "none")?"":prefix, lowthreshold, highthreshold);
+                    var npath = NOTIFICATION_PREFIX + ((prefix == "none")?"":prefix) + path;
+                    var nactual = (lowthreshold)?lowthreshold.actual:highthreshold.actual;
                     if (test == 0) {
-                        log.N("cancelling notification on '" + nPath + "'", false);
-                    } else if (nValue !== undefined) {
-                        log.N("issuing '" + nValue['state'] + "' notification on '" + nPath, false);
+                        var notification = app.getSelfPath(npath);
+                        if (notification != null) {
+                            log.N(nactual + " => cancelling '" + notification.value.state + "' notification on '" + npath + "'", false);
+                            cancelNotification(npath);
+                        }
+                    } else {
+                        var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
+                        log.N(nactual + " => issuing '" + nstate + "' notification on '" + npath + "'", false);
+			            issueNotificationUpdate(test, npath, message, lowthreshold, highthreshold);
                     }
 			    }));
             }
@@ -87,26 +95,28 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-	function issueNotificationUpdate(test, path, message, prefix, lowthreshold, highthreshold) {
-        var notificationPath = "notifications." + prefix + path;
+    function cancelNotification(npath) {
+		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": npath, "value": null } ] } ] };
+		app.handleMessage(plugin.id, delta);
+        return;
+    }
+
+	function issueNotificationUpdate(test, npath, message, lowthreshold, highthreshold) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
-		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": notificationPath, "value": notificationValue } ] } ] };
+		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": npath, "value": notificationValue } ] } ] };
 		var vessel = app.getSelfPath("name");
-
-		if (test != 0) {
-            var state = ((test == 1)?highthreshold:lowthreshold).state;
-            var method = ((test == 1)?highthreshold:lowthreshold).method;
-            var value = ((test == 1)?highthreshold:lowthreshold).actual;
-            var threshold = ((test == 1)?highthreshold:lowthreshold).value;
-
-		    test = (test == -1)?"below":"above";
-		    message = (message === undefined)?app.getSelfPath(path + ".meta.displayName"):((!message)?path:eval("`" + message + "`"));
-            notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
-		}
+        var state = ((test == 1)?highthreshold:lowthreshold).state;
+        var method = ((test == 1)?highthreshold:lowthreshold).method;
+        var value = ((test == 1)?highthreshold:lowthreshold).actual;
+        var threshold = ((test == 1)?highthreshold:lowthreshold).value;
+		var comp = (test == 1)?"above":"below";
+        var action = (state == "normal")?"stopping":"starting";
+		message = (message)?eval("`" + message + "`"):"";
+        notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
         delta.updates[0].values[0].value = notificationValue;
 		app.handleMessage(plugin.id, delta);
-        return([ notificationPath, notificationValue ]);
+        return;
 	}
 
 	return(plugin);
