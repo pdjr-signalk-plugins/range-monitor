@@ -16,8 +16,9 @@
  */
 
 const Bacon = require('baconjs')
-const Schema = require('./lib/schema.js');
-const Log = require('./lib/log.js');
+const Schema = require('./lib/signalk-libschema/Schema.js');
+const Log = require('./lib/signalk-liblog/Log.js');
+const Notification = require('./lib/signalk-libnotification/Notification.js');
 
 const PLUGIN_SCHEMA_FILE = __dirname + "/schema.json";
 const PLUGIN_UISCHEMA_FILE = __dirname + "/uischema.json";
@@ -31,7 +32,8 @@ module.exports = function(app) {
 	plugin.name = "Threshold notifier";
 	plugin.description = "Issue notifications when a path value goes outside defined limits.";
 
-    const log = new Log(app.setProviderStatus, app.setProviderError, plugin.id);
+    const log = new Log(plugin.id, { ncallback: app.setProviderStatus, ecallback: app.setProviderError });
+    const notification = new Notification(app, plugin.id);
 
 	plugin.schema = function() {
         return(Schema.createSchema(PLUGIN_SCHEMA_FILE).getSchema());
@@ -76,13 +78,13 @@ module.exports = function(app) {
                     if (test == 0) {
                         var notification = app.getSelfPath(npath);
                         if (notification != null) {
-                            log.N(nactual + " => cancelling '" + notification.value.state + "' notification on '" + npath + "'", false);
-                            cancelNotification(npath);
+                            //log.N(nactual + " => cancelling '" + notification.value.state + "' notification on '" + npath + "'", false);
+                            //cancelNotification(npath);
                         }
                     } else {
                         var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
                         log.N(nactual + " => issuing '" + nstate + "' notification on '" + npath + "'", false);
-			            issueNotificationUpdate(test, npath, message, lowthreshold, highthreshold);
+			            issueNotificationUpdate(notification, test, npath, message, lowthreshold, highthreshold);
                     }
 			    }));
             }
@@ -95,16 +97,9 @@ module.exports = function(app) {
 		unsubscribes = []
 	}
 
-    function cancelNotification(npath) {
-		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": npath, "value": null } ] } ] };
-		app.handleMessage(plugin.id, delta);
-        return;
-    }
-
-	function issueNotificationUpdate(test, npath, message, lowthreshold, highthreshold) {
+	function issueNotification(nfactory, test, npath, message, lowthreshold, highthreshold) {
         var notificationValue = null;
         var date = (new Date()).toISOString();
-		var delta = { "context": "vessels." + app.selfId, "updates": [ { "source": { "label": "self.notificationhandler" }, "values": [ { "path": npath, "value": notificationValue } ] } ] };
 		var vessel = app.getSelfPath("name");
         var state = ((test == 1)?highthreshold:lowthreshold).state;
         var method = ((test == 1)?highthreshold:lowthreshold).method;
@@ -113,9 +108,7 @@ module.exports = function(app) {
 		var comp = (test == 1)?"above":"below";
         var action = (state == "normal")?"stopping":"starting";
 		message = (message)?eval("`" + message + "`"):"";
-        notificationValue = { "state": state, "message": message, "method": method, "timestamp": date };
-        delta.updates[0].values[0].value = notificationValue;
-		app.handleMessage(plugin.id, delta);
+        nfactory.issue(npath, message, { state: state, method: method });
         return;
 	}
 
