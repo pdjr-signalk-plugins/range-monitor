@@ -84,7 +84,7 @@ module.exports = function(app) {
                     } else {
                         var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
                         log.N(nactual + " => issuing '" + nstate + "' notification on '" + npath + "'", false);
-			            issueNotificationUpdate(notification, test, npath, message, lowthreshold, highthreshold);
+			            issueNotification(notification, test, npath, message, lowthreshold, highthreshold);
                     }
 			    }));
             }
