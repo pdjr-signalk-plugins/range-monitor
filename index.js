@@ -76,9 +76,9 @@ module.exports = function(app) {
                     var npath = NOTIFICATION_PREFIX + ((prefix == "none")?"":prefix) + path;
                     var nactual = (lowthreshold)?lowthreshold.actual:highthreshold.actual;
                     if (test == 0) {
-                        var notification = app.getSelfPath(npath);
-                        if (notification != null) {
-                            //log.N(nactual + " => cancelling '" + notification.value.state + "' notification on '" + npath + "'", false);
+                        var noti = app.getSelfPath(npath);
+                        if (noti != null) {
+                            //log.N(nactual + " => cancelling '" + noti.value.state + "' notification on '" + npath + "'", false);
                             //cancelNotification(npath);
                         }
                     } else {
