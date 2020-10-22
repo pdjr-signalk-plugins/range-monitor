@@ -32,7 +32,7 @@ module.exports = function(app) {
 	plugin.name = "Threshold notifier";
 	plugin.description = "Issue notifications when a path value goes outside defined limits.";
 
-    const log = new Log(plugin.id, { ncallback: app.setProviderStatus, ecallback: app.setProviderError });
+    const log = new Log(plugin.id, { ncallback: app.setPluginStatus, ecallback: app.setPluginError });
     const notification = new Notification(app, plugin.id);
 
 	plugin.schema = function() {
