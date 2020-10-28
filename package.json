@@ -4,7 +4,7 @@
   "description": "Raise notifications based on some path value",
   "main": "index.js",
   "dependencies": {
-    "baconjs": "^1.0.1"
+    "baconjs": "1.0.1"
   },
   "devDependencies": {},
   "scripts": {
@@ -22,5 +22,8 @@
     "notifications"
   ],
   "author": "Paul Reeve <preeve@pdjr.eu>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "directories": {
+    "lib": "lib"
+  }
 }
