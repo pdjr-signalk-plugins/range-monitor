@@ -1,7 +1,7 @@
 {
 	"type": "object",
 	"properties": {
-		"paths": {
+		"rules": {
 			"type": "array",
 			"title": "",
 			"items": {
@@ -9,10 +9,14 @@
 				"type": "object",
                 "required": [ "path" ],
 				"properties": {
-					"path": {
+					"triggerpath": {
 						"title": "Monitored path",
 						"type": "string"
 					},
+                    "notificationpath": {
+                      "title": "Notification path",
+                      "type": "string"
+                    },
                     "options": {
                         "title": "Options",
                         "type": "array",

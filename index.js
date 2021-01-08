@@ -18,99 +18,89 @@
 const Bacon = require('baconjs')
 const Schema = require('./lib/signalk-libschema/Schema.js');
 const Log = require('./lib/signalk-liblog/Log.js');
-const Notification = require('./lib/signalk-libnotification/Notification.js');
+const Delta = require('./lib/signalk-libdelta/Delta.js');
 
+const PLUGIN_ID = "pdjr-skplugin-threshold-notifier";
 const PLUGIN_SCHEMA_FILE = __dirname + "/schema.json";
 const PLUGIN_UISCHEMA_FILE = __dirname + "/uischema.json";
 const NOTIFICATION_PREFIX = "notifications.";
 
 module.exports = function(app) {
-	var plugin = {};
-	var unsubscribes = [];
+  var plugin = {};
+  var unsubscribes = [];
 
-	plugin.id = "threshold-notifier";
-	plugin.name = "Threshold notifier";
-	plugin.description = "Issue notifications when a path value goes outside defined limits.";
+  plugin.id = PLUGIN_ID;
+  plugin.name = "Threshold notifier";
+  plugin.description = "Issue notifications when a path value goes outside defined limits.";
 
-    const log = new Log(plugin.id, { ncallback: app.setPluginStatus, ecallback: app.setPluginError });
-    const notification = new Notification(app, plugin.id);
+  const log = new Log(plugin.id, { ncallback: app.setPluginStatus, ecallback: app.setPluginError });
 
-	plugin.schema = function() {
-        return(Schema.createSchema(PLUGIN_SCHEMA_FILE).getSchema());
-	}
+  plugin.schema = function() {
+    return(Schema.createSchema(PLUGIN_SCHEMA_FILE).getSchema());
+  }
 
-	plugin.uiSchema = function() {
-        return(Schema.createSchema(PLUGIN_UISCHEMA_FILE).getSchema());
-	}
+  plugin.uiSchema = function() {
+    return(Schema.createSchema(PLUGIN_UISCHEMA_FILE).getSchema());
+  }
 
-    // Filter out rules which are disabled and map monitored path values into
-    // a stream of comparator values where -1 = below low threshold, 1 = above
-    // high threshold and 0 = between threshold.  Eliminate duplicate values
-    // in this new stream and issue a notification based upon the resulting
-    // comparator.  
-    //  
-	plugin.start = function(options) {
-        if (options.paths !== undefined) log.N("monitoring " + options.paths.length + " path" + ((options.paths.length == 1)?"":"s"));
-		unsubscribes = (options.paths || [])
-        .reduce((a, {
-            path,
-            options,
-            message,
-            prefix,
-            lowthreshold,
-            highthreshold
-        }) => {
-            if (options.includes("enabled")) { 
-			    var stream = app.streambundle.getSelfStream(path)
-			    a.push(stream.map(value => {
-                    var retval = 0;
-                    if (lowthreshold) lowthreshold['actual'] = value;
-                    if (highthreshold) highthreshold['actual'] = value;
-			        if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold.value)) {
-                        retval = -1;
-				    } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold.value)) {
-                        retval = 1;
-				    }
-                    return(retval);
-			    }).skipDuplicates().onValue(test => {
-                    var npath = NOTIFICATION_PREFIX + ((prefix == "none")?"":prefix) + path;
-                    var nactual = (lowthreshold)?lowthreshold.actual:highthreshold.actual;
-                    if (test == 0) {
-                        var noti = app.getSelfPath(npath);
-                        if (noti != null) {
-                            //log.N(nactual + " => cancelling '" + noti.value.state + "' notification on '" + npath + "'", false);
-                            //cancelNotification(npath);
-                        }
-                    } else {
-                        var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
-                        log.N(nactual + " => issuing '" + nstate + "' notification on '" + npath + "'", false);
-			            issueNotification(notification, test, npath, message, lowthreshold, highthreshold);
-                    }
-			    }));
-            }
-            return(a);
-		}, []);
-	}
+  // Filter out rules which are disabled and map monitored path values into
+  // a stream of comparator values where -1 = below low threshold, 1 = above
+  // high threshold and 0 = between threshold.  Eliminate duplicate values
+  // in this new stream and issue a notification based upon the resulting
+  // comparator.  
+  //  
+  plugin.start = function(options) {
+    options.rules = (options.rules || []).filter(rule => rule.enabled);
+    log.N("monitoring " + options.rules.length + " path" + ((options.rules.length == 1)?"":"s"));
 
-	plugin.stop = function() {
-		unsubscribes.forEach(f => f())
-		unsubscribes = []
-	}
+    unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, message, lowthreshold, highthreshold }) => {
+      var stream = app.streambundle.getSelfStream(triggerpath)
+      a.push(stream.map(value => {
+        var retval = 0;
+        if (lowthreshold) lowthreshold['actual'] = value;
+        if (highthreshold) highthreshold['actual'] = value;
+        if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold.value)) {
+          retval = -1;
+        } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold.value)) {
+          retval = 1;
+        }
+        return(retval);
+      }).skipDuplicates().onValue(test => {
+        var nactual = (lowthreshold)?lowthreshold.actual:highthreshold.actual;
+        if (test == 0) {
+          var noti = app.getSelfPath(notificationpath);
+          if (noti != null) {
+            //log.N(nactual + " => cancelling '" + noti.value.state + "' notification on '" + npath + "'", false);
+            //cancelNotification(npath);
+          }
+        } else {
+          var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
+          log.N(nactual + " => issuing '" + nstate + "' notification on '" + notificationpath + "'", false);
+          issueNotification(notificationpath, message, test, lowthreshold, highthreshold);
+        }
+      }));
+      return(a);
+    }, []);
+  }
 
-	function issueNotification(nfactory, test, npath, message, lowthreshold, highthreshold) {
-        var notificationValue = null;
-        var date = (new Date()).toISOString();
-		var vessel = app.getSelfPath("name");
-        var state = ((test == 1)?highthreshold:lowthreshold).state;
-        var method = ((test == 1)?highthreshold:lowthreshold).method;
-        var value = ((test == 1)?highthreshold:lowthreshold).actual;
-        var threshold = ((test == 1)?highthreshold:lowthreshold).value;
-		var comp = (test == 1)?"above":"below";
-        var action = (state == "normal")?"stopping":"starting";
-		message = (message)?eval("`" + message + "`"):"";
-        nfactory.issue(npath, message, { state: state, method: method });
-        return;
-	}
+  plugin.stop = function() {
+    unsubscribes.forEach(f => f())
+    unsubscribes = []
+  }
 
-	return(plugin);
+  function issueNotification(path, message, test, lowthreshold, highthreshold) {
+    var date = (new Date()).toISOString();
+    var vessel = app.getSelfPath("name");
+    var state = ((test == 1)?highthreshold:lowthreshold).state;
+    var method = ((test == 1)?highthreshold:lowthreshold).method;
+    var value = ((test == 1)?highthreshold:lowthreshold).actual;
+    var threshold = ((test == 1)?highthreshold:lowthreshold).value;
+    var comp = (test == 1)?"above":"below";
+    var action = (state == "normal")?"stopping":"starting";
+    message = (message)?eval("`" + message + "`"):"";
+    (new Delta(app, plugin.id)).addValue(path, { message: message, state: state, method: method }).commit().clear();
+    return;
+  }
+
+  return(plugin);
 }
