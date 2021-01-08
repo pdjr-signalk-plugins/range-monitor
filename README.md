@@ -1,37 +1,37 @@
-# signalk-threshold-notifier
+# pdjr-skplugin-threshold-notifier
 
-[Signal K Node Server](https://github.com/SignalK/signalk-server-node) plugin
-which raises notifications based on one or more path values.
+Raise notifications based on some path value.
 
-The real-time values of one or more user-specified paths are compared against
-user-defined thresholds and Signal K notifications raised as these boundaries
-are encountered. 
+The real-time values of one or more user-specified keys are compared
+against user-defined thresholds and Signal K notifications raised as
+these boundaries are encountered. 
 
-Thanks are due to Scott Bender for his
-[signalk-simple-notifications](https://github.com/sbender9/signalk-simple-notifications)
-plugin which this work simply elaborates.
 ## System requirements
 
-__signalk-threshold-notifier__ has no special system requirements.
+__pdjr-skplugin-threshold-notifier__ has no special systems
+ requirements.
+
 ## Installation
 
-Download and install __signalk-threshold-notifier__ using the _Appstore_ link
-in your Signal K Node server console.
+Download and install __pdjr-skplugin-threshold-notifier__ using the
+_Appstore_ link in your Signal K Node server console.
 
 The plugin can also be downloaded from the
-[project homepage](https://github.com/preeve9534/signalk-threshold-notifier)
+[project homepage](https://github.com/preeve9534/pdjr-skplugin-threshold-notifier)
 and installed using
 [these instructions](https://github.com/SignalK/signalk-server-node/blob/master/SERVERPLUGINS.md).
-## Usage
 
- __signalk-threshold-notifier__ is configured through the Signal K Node server
-plugin configuration interface.
-Navigate to _Server_->_Plugin config_ and select the _Threshold notifier_ tab.
+## Use
+
+__pdjr-skplugin-threshold-notifier__ is configured through the Signal K
+node server plugin configuration interface.
 
 ![Configuration panel](readme/config.png)
 
-The plugin configuration consists of a list of rules, each of which specifies
-a Signal K path which should be monitored, upper and lower limits against
+The plugin configuration consists of a list of *rules*, each of which
+specifies a Signal K *triggerpath* which should be monitored, a
+*notificationpath* on which upper and
+lower limits against
 which notifications should be raised and the attributes of such notifications.
 On first use the list of monitored paths will be empty.
 
@@ -183,7 +183,7 @@ pump must have a state equal to "normal".
 
 ## Messages
 
-__signalk-threshold-notifier__ issues the following message to the Signal K
+__pdjr-skplugin-threshold-notifier__ issues the following message to the Signal K
 Node server console and system logging facility.
 
 __Monitoring *n* path__[__s__]  
