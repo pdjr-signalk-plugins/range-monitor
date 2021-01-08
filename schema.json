@@ -1,98 +1,90 @@
 {
-	"type": "object",
-	"properties": {
-		"rules": {
-			"type": "array",
-			"title": "",
-			"items": {
-                "title": "Rule",
-				"type": "object",
-                "required": [ "path" ],
-				"properties": {
-					"triggerpath": {
-						"title": "Monitored path",
-						"type": "string"
-					},
-                    "notificationpath": {
-                      "title": "Notification path",
-                      "type": "string"
-                    },
-                    "options": {
-                        "title": "Options",
-                        "type": "array",
-                        "default": [ "enabled" ],
-                        "items": {
-                            "type": "string",
-                            "enum": [ "enabled" ],
-                            "enumNames": [ "Enabled?" ]
-                        },
-                        "uniqueItems": true
-                    },
-				    "message": {
-				        "title": "Notification message",
-				        "type": "string",
-                        "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
-				    },
-                    "prefix": {
-                        "title": "Path prefix",
-                        "type": "string",
-                        "enum": [ "none", "control." ],
-                        "default": "none"
-                    },
-                    "lowthreshold": {
-                        "title": "",
-                        "type": "object",
-                        "properties": {
-					        "value": {
-					            "title": "Low threshold",
-					            "type": "number"
-					        },						
-				            "state": {
-				                "title": "Alarm state",
-				                "type": "string",
-                                "default": "alert",
-				                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
-				            },
-                            "method": {
-                                "title": "Suggested method",
-                                "type": "array",
-                                "default": [],
-                                "items": {
-                                    "type": "string",
-                                    "enum": [ "visual", "sound" ]
-                                },
-                                "uniqueItems": true
-                            }
-                        }
-                    },
-                    "highthreshold": {
-                        "title": "",
-                        "type": "object",
-                        "properties": {
-					        "value": {
-							    "title": "High threshold",
-							    "type": "number"
-							},						
-						    "state": {
-						        "title": "Alarm state",
-						        "type": "string",
-		                        "default": "alert",
-						        "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
-						    },
-		                    "method": {
-		                        "title": "Suggested method",
-		                        "type": "array",
-		                        "default": [],
-		                        "items": {
-		                            "type": "string",
-		                            "enum": [ "visual", "sound" ]
-		                        },
-		                        "uniqueItems": true
-		                    }
-                        }
-                    }
-                }
-			}
-		}
-	}
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "title": "",
+      "items": {
+        "title": "Rule",
+        "type": "object",
+        "properties": {
+          "triggerpath": {
+            "title": "Monitored path",
+            "type": "string"
+          },
+          "notificationpath": {
+            "title": "Notification path",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enable rule?",
+            "type": "boolean",
+            "default": true
+          },
+          "lowthreshold": {
+            "title": "",
+            "type": "object",
+            "properties": {
+              "value": {
+                "title": "Low threshold",
+                "type": "number"
+              },                        
+              "message": {
+                "title": "Notification message",
+                "type": "string",
+                "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+              },
+              "state": {
+                "title": "Alarm state",
+                "type": "string",
+                "default": "alert",
+                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+              },
+              "method": {
+                "title": "Suggested method",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string",
+                  "enum": [ "visual", "sound" ]
+                },
+                "uniqueItems": true
+              }
+            }
+          },
+          "highthreshold": {
+            "title": "",
+            "type": "object",
+            "properties": {
+              "value": {
+                "title": "High threshold",
+                "type": "number"
+              },                        
+              "message": {
+                "title": "Notification message",
+                "type": "string",
+                "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+              },
+              "state": {
+                "title": "Alarm state",
+                "type": "string",
+                "default": "alert",
+                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+              },
+              "method": {
+                "title": "Suggested method",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string",
+                  "enum": [ "visual", "sound" ]
+                },
+                "uniqueItems": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

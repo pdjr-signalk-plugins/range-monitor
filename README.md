@@ -2,200 +2,97 @@
 
 Raise notifications based on some path value.
 
-The real-time values of one or more user-specified keys are compared
-against user-defined thresholds and Signal K notifications raised as
-these boundaries are encountered. 
+__pdjr-skplugin-threshold-notifier__ compares the real-time values of
+one or more keys against user-defined thresholds and raises Signal K
+notifications if these limits are encountered.
 
-## System requirements
+## Operating principle
 
-__pdjr-skplugin-threshold-notifier__ has no special systems
- requirements.
+__pdjr-skplugin-threshold-notifier__ processes a collection of *rules*
+each of which defines a *triggerpath*, a *notificationpath* and upper
+and lower thresholds.
 
-## Installation
+The plugin subscribes to each of the defined *triggerpath*s and
+checks each incoming value against the defined thresholds.
+When a value transits its upper threshold then a notification is
+published on *notificationpath* using properties defined for an upper
+threshold excursion.
+When a value transits its lower threshold then a notification is
+published on *notificationpath* using properties defined for a lower
+threshold excursion.
+The difference between the two notification property values can be used
+by a consumer to take actions which are initiated by one excursion and
+cancelled by the other - one example might be the control of a
+discharge pump.
 
-Download and install __pdjr-skplugin-threshold-notifier__ using the
-_Appstore_ link in your Signal K Node server console.
+## Configuration properties
 
-The plugin can also be downloaded from the
-[project homepage](https://github.com/preeve9534/pdjr-skplugin-threshold-notifier)
-and installed using
-[these instructions](https://github.com/SignalK/signalk-server-node/blob/master/SERVERPLUGINS.md).
+| Property name                        | Description |
+|:-------------------------------------|:------------|
+| __rules__                            | Array of *rule* objects, each of which defines a rule that should be processed by the plugin. |
+| *rule*.__triggerpath__               | Signal K key which should be monitored. |
+| *rule*.__notificationpath__          | Signal K key on which notifications should be issued when *triggerpath* value encounters a threshold. |
+| *rule*.__enabled__                   | Boolean property enabling or disabling the rule. |
+| *rule*.__lowthreshold__              | Definition of low threshold and associated properties. |
+| *rule*.__lowthreshold__.__value__    | Low threshold value. |
+| *rule*.__lowthreshold__.__message__  | Message property value for low notification (issued when trigger value < low threshold). |
+| *rule*.__lowthreshold__.__state__    | State property value for low notification. |
+| *rule*.__lowthreshold__.__method__   | Method property value for low notification. |
+| *rule*.__highthreshold__             | Definition of high threshold and associated properties. |
+| *rule*.__highthreshold__.__value__   | High threshold value. |
+| *rule*.__highthreshold__.__message__ | Message property value for high notification (issued when trigger value > high threshold). |
+| *rule*.__highthreshold__.__state__   | State property value for high notification. |
+| *rule*.__highthreshold__.__method__  | Method property value for high notification. |
 
-## Use
+Any of the following tokens may be used in the supplied __message__
+text and these will be interpolated with the described value when the
+notification message is composed.
 
-__pdjr-skplugin-threshold-notifier__ is configured through the Signal K
-node server plugin configuration interface.
+_${path}_ will be replaced by the value of __triggerpath__.
 
-![Configuration panel](readme/config.png)
+_${test}_ will be replaced by one of "above", "below" or "between"
+dependant upon the threshold being crossed and the direction of
+crossing.
 
-The plugin configuration consists of a list of *rules*, each of which
-specifies a Signal K *triggerpath* which should be monitored, a
-*notificationpath* on which upper and
-lower limits against
-which notifications should be raised and the attributes of such notifications.
-On first use the list of monitored paths will be empty.
+_${threshold}_ will be replaced with the __value__ of the threshold
+triggering the rule or, in the case of the path value being between
+thresholds with the string "_n_ and _m_" where _n_ is the low threshold
+and _m_ is the high threshold.
 
-New rules can be added by clicking the __[+]__ button and any existing,
-unwanted, rules can be deleted by clicking their adjacent __[x]__ button.
-
-Each rule includes the following fields.
-
-__Monitored path__  
-A required text value which specifies the Signal K Node server path which
-should be monitored.
-There is no default value.
-
-Enter here the full Signal K path for the value which you would like to
-monitor, for example, "tanks.wasteWater.0.currentValue".
-
-__Options->Enabled?__  
-Whether or not to process this rule.
-Default value is yes (checked).
-
-__Notification message__  
-An optional text message which will be assigned to the message property of
-all notifications generated by the rule.
-The default value is a simple, automatically generated, message.
-
-Enter here the text of the message you would like to be issued when the
-monitored path value crosses one of the defined thresholds.
-If the option is left blank then the plugin will insert just the monitored
-path text as an identifier when it raises a notification.
-
-Any of the following tokens may be used in the supplied message text and these
-will be interpolated with the described value when the notification message is
-composed.
-
-_${path}_ will be replaced by the value of the _Monitored path_ option.
-
-_${test}_ will be replaced by one of "above", "below" or "between" dependant
-upon the threshold being crossed and the direction of crossing.
-
-_${threshold}_ will be replaced with the value of the threshold triggering the
-rule or, in the case of the path value being between thresholds with the
-string "_n_ and _m_" where _n_ is the low threshold and _m_ is the high
-threshold.
-
-_${value}_ will be replaced with the instantaneous value of the monitored path
-that triggered the rule.
+_${value}_ will be replaced with the instantaneous value of the
+monitored path that triggered the rule.
 
 _${vessel}_ will be replaced with Signal K's idea of the vessel name.
 
-An example message text might be "${vessel}: ${path} is ${test} ${threshold} (currently ${value})".
+An example message text might be "${vessel}: ${path} is ${test}
+${threshold} (currently ${value})".
 
-__Path prefix__  
-A notification path component which will be inserted after the "notifications."
-root and before the value of _Monitored path_.
-This allows semantic classification of notifications and supports overlapping
-notifications on the same monitored path.
-Default is "none" which places notifications directly under the "notifications."
-root. 
-
-__Low threshold__  
-An optional numerical value which sets the lower threshold against which the
-monitored path value will be compared.
-The default value is a blank entry which disables monitoring of the low
-threshold.
-
-If a value is specified and the monitored path value falls below this limit
-then a notification of the type defined by _Alarm state_ will be issued.
-
-__Alarm state__  
-A required value which will be assigned to the notification _state_ property
-which is used to signal the severity of the notification.
-Default is to set the alarm state to "alert".
-
-Choose a value appropriate to the notification event.
-Remember that notifications in Signal K may be processed by downstream handlers
-and the chosen state could have significance elsewhere: an example is the
-__signalk-switchbank__ plugin which treats "normal" and non-"normal" alarm
-states as part of a switching signal.
-
-__Suggested method__  
-An optional value which will be assigned to the notification _method_ property
-which is used to suggest to downstream notification handlers a preference for
-how a notification may be handled.
-Default is to express no preference.
-
-Choose any values which you think appropriate, or none at all.
-Once again, some downstream notification handlers may require a particular
-value or combination of values in order to perform their function.
-
-The cluster of options associated with defining a high threshold have similar
-semantics to those described above: the __High threshold__ option itself,
-naturally, defines an upper threshold against which the monitored path value
-will be tested for a low-to-high transition.
-## Use cases
-
-__Managing *Beatrice*'s waste tank__
-
-Once upon a time the black water tank on _Beatrice_ overflowed: I had failed
-to take note of the tank gauge and had no audible alarm.
-I now use Signal K to implement an escalating response to waste tank filling
-which might ensure that there is never a repeat of this catastrophe.
-
-My first line of defense is to raise a notification which is picked up by my
-helm annunciator and also detected by __signalk-renotifier__ which forwards
-the notification to my cell phone via SMS.
+## Reference configuration
 ```
 {
-    "path": "tanks.wasteWater.0.currentLevel",
-    "message": "${vessel}: waste water level is ${test} ${threshold}",
-    "highthreshold": {
-        "value": 0.8,
-        "state": "warning",
-        "method": [ "visual" ]
-    }
-    "options": [ "enabled" ],
-    "prefix": "none"
+  "enabled": true,
+  "enableLogging": false,
+  "enableDebug": false,
+  "configuration": {
+    "rules": [
+      {
+        "triggerpath": "tanks.wasteWater.0.currentLevel",
+        "notificationpath": "notifications.tanks.wasteWater.0.currentLevel.override",
+        "enabled": true,
+        "highthreshold": {
+          "value": 0.3,
+          "message": "waste water level is ${comp} ${threshold}: ${action} discharge pump",
+          "state": "alert",
+          "method": [ "visual" ]
+        },
+        "lowthreshold": {
+          "value": 0.05,
+          "message": "waste water level is ${comp} ${threshold}: ${action} discharge pump",
+          "state": "normal",
+          "method": []
+        }
+      }
+    ]
+  }
 }
 ```
-
-Notwithstanding this precaution, I have an end-stop strategy which should make
-sure that there is never again a problem: this environmentally unfriendly
-last-ditch solution automatically starts my discharge pump if the waste tank
-level becomes critical.
-
-I use the __signalk-switchbank__ plugin to operate the pump and this requires
-a notification to start the pump and a subsequent notification to stop it.
-The configuration file snippet for the rule I use looks like this:
-```
-{
-    "path": "tanks.wasteWater.0.currentLevel",
-    "message": "${vessel}: waste water automatic discharge: level is ${test} ${threshold} (${value})",
-    "highthreshold": {
-        "value": 0.9,
-        "state": "alert",
-        "method": [ ]
-    },
-    "lowthreshold": {
-        "value": 0.01,
-        "state": "normal",
-        "method": [ ]
-    },
-    "options": [ "enabled" ],
-    "prefix": "control."
-}
-```
-The notification which starts the pump must have a state which is not equal to
-"normal" (in this case it is "alert") and the notification which stops the
-pump must have a state equal to "normal".
-
-## Messages
-
-__pdjr-skplugin-threshold-notifier__ issues the following message to the Signal K
-Node server console and system logging facility.
-
-__Monitoring *n* path__[__s__]  
-The plugin has initialised and is monitoring *n* Signal K paths.
-
-Additionally, the following messages are issued just to the system logging
-facility.
-
-__cancelling notification on '*path*'__  
-The monitored value has returned between the low and high thresholds and the
-notification on _path_ is being removed. 
-
-__issuing '*state*' notification on '*path*'__  
-The monitored value has passed a threshold and a notification of type *state*
-has been issued on *path*.

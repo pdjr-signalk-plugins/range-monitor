@@ -53,7 +53,7 @@ module.exports = function(app) {
     options.rules = (options.rules || []).filter(rule => rule.enabled);
     log.N("monitoring " + options.rules.length + " path" + ((options.rules.length == 1)?"":"s"));
 
-    unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, message, lowthreshold, highthreshold }) => {
+    unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold }) => {
       var stream = app.streambundle.getSelfStream(triggerpath)
       a.push(stream.map(value => {
         var retval = 0;
@@ -76,7 +76,7 @@ module.exports = function(app) {
         } else {
           var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
           log.N(nactual + " => issuing '" + nstate + "' notification on '" + notificationpath + "'", false);
-          issueNotification(notificationpath, message, test, lowthreshold, highthreshold);
+          issueNotification(notificationpath, nstate.message, test, lowthreshold, highthreshold);
         }
       }));
       return(a);
