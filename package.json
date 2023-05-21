@@ -5,9 +5,9 @@
   "main": "index.js",
   "signalk-plugin-enabled-by-default": true,
   "dependencies": {
-    "baconjs": "^1.0.1"
+    "baconjs": "^1.0.1",
+    "sprintf-js": "^1.1.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
