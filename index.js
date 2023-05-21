@@ -147,7 +147,11 @@ module.exports = function(app) {
     if ((options.rules) && (Array.isArray(options.rules))) {
       options.rules = options.rules.filter(rule => rule.enabled);
       if (options.rules.length > 0) {
-        log.N("monitoring " + options.rules.length + " path" + ((options.rules.length == 1)?"":"s"));
+        if (options.rules.length == 1) {
+          log.N("implementing threshold rule on '%s'", options.rules[0].triggerpath);
+        } else {
+          log.N("implementing " + options.rules.length + " threshold rules");
+        }
 
         unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold }) => {
           var stream = app.streambundle.getSelfStream(triggerpath);
