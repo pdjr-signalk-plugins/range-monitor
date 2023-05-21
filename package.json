@@ -3,6 +3,7 @@
   "version": "3.1.1",
   "description": "Raise notifications based on some path value",
   "main": "index.js",
+  "signalk-plugin-enabled-by-default": true,
   "dependencies": {
     "baconjs": "^1.0.1"
   },
@@ -12,14 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://githib.com/preeve9534/pdjr-skplugin-threshold-notifier"
+    "url": "https://githib.com/pdjr-signalk/pdjr-skplugin-threshold-notifier"
   },
   "keywords": [
     "signalk-node-server-plugin",
-    "signalk",
-    "threshold",
-    "notifier",
-    "notifications"
+    "signalk-category-notifications",
+    "signalk-category-utility"
   ],
   "author": "Paul Reeve <preeve@pdjr.eu>",
   "license": "Apache-2.0",
