@@ -131,26 +131,24 @@ module.exports = function(app) {
   const delta = new Delta(app, plugin.id);
   const log = new Log(plugin.id, { ncallback: app.setPluginStatus, ecallback: app.setPluginError });
 
-  // Filter out rules which are disabled and map monitored path values into
-  // a stream of comparator values where -1 = below low threshold, 1 = above
-  // high threshold and 0 = between threshold.  Eliminate duplicate values
-  // in this new stream and issue a notification based upon the resulting
-  // comparator.  
-  //  
   plugin.start = function(options) {
 
     if (Object.keys(options).length === 0) {
       options = OPTIONS_DEFAULT;
-      app.savePluginOptions(options, () => { log.N("saving default configuration to disk", false); });
+      app.savePluginOptions(options, () => {
+        log.N("plugin configuration file missing or invalid.", false);
+        log.N("saving default configuration and restarting plugin.", false)
+      });
     }
 
     if ((options.rules) && (Array.isArray(options.rules))) {
       options.rules = options.rules.filter(rule => rule.enabled);
       if (options.rules.length > 0) {
         if (options.rules.length == 1) {
-          log.N("implementing threshold rule on '%s'", options.rules[0].triggerpath);
+          log.N("applying threshold rule to '%s'", options.rules[0].triggerpath);
         } else {
-          log.N("implementing " + options.rules.length + " threshold rules");
+          log.N("applying multiple threshold rules (see log for details).");
+          options.rules.forEach(rule => { log.N("applying threshold rule to '%s'", rule.triggerpath, false); } );
         }
 
         unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold }) => {
