@@ -176,7 +176,6 @@ module.exports = function(app) {
             } else {
               var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
               log.N(nactual + " => issuing '" + nstate + "' notification on '" + notificationpath + "'", false);
-              issueNotification(notificationpath, nstate.message, test, lowthreshold, highthreshold);
               delta.clear().addValue(notificationpath, {
                 "message": nstate.message,
                 "state": ((test == 1)?highthreshold:lowthreshold).state,
