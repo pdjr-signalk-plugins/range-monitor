@@ -14,41 +14,48 @@ and lower thresholds.
 
 The plugin subscribes to each of the defined *triggerpath*s and
 checks each incoming value against the defined thresholds.
+
 When a value transits its upper threshold then a notification is
 published on *notificationpath* using properties defined for an upper
 threshold excursion.
 When a value transits its lower threshold then a notification is
 published on *notificationpath* using properties defined for a lower
 threshold excursion.
-The difference between the two notification property values can be used
+
+A difference between the two notification property values can be used
 by a consumer to take actions which are initiated by one excursion and
 cancelled by the other - one example might be the control of a
 discharge pump.
 
-## Configuration properties
+## Configuration
 
-| Property name                        | Description |
-|:-------------------------------------|:------------|
-| __rules__                            | Array of *rule* objects, each of which defines a rule that should be processed by the plugin. |
-| *rule*.__triggerpath__               | Signal K key which should be monitored. |
-| *rule*.__notificationpath__          | Signal K key on which notifications should be issued when *triggerpath* value encounters a threshold. |
-| *rule*.__enabled__                   | Boolean property enabling or disabling the rule. |
-| *rule*.__lowthreshold__              | Definition of low threshold and associated properties. |
-| *rule*.__lowthreshold__.__value__    | Low threshold value. |
-| *rule*.__lowthreshold__.__message__  | Message property value for low notification (issued when trigger value < low threshold). |
-| *rule*.__lowthreshold__.__state__    | State property value for low notification. |
-| *rule*.__lowthreshold__.__method__   | Method property value for low notification. |
-| *rule*.__highthreshold__             | Definition of high threshold and associated properties. |
-| *rule*.__highthreshold__.__value__   | High threshold value. |
-| *rule*.__highthreshold__.__message__ | Message property value for high notification (issued when trigger value > high threshold). |
-| *rule*.__highthreshold__.__state__   | State property value for high notification. |
-| *rule*.__highthreshold__.__method__  | Method property value for high notification. |
+The plugin configuration file consists of a single *rules* array
+property consisting of zero or more threshold *rule* objects.
 
-Any of the following tokens may be used in the supplied __message__
-text and these will be interpolated with the described value when the
-notification message is composed.
+Each *rule* object has the following properties.
 
-_${path}_ will be replaced by the value of __triggerpath__.
+| Property            | Default | Description |
+| :------------------ | :------ | :-----------|
+| triggerpath         | (none)  | Path which should be monitored. |
+| notificationpath    | (none)  | Path on which notifications should be issued when the *triggerpath* value transits a threshold. |
+| enabled             | true    | Boolean property enabling or disabling the rule. |
+| lowthreshold        | (none)  | Definition of low threshold and associated properties. |
+| highthreshold       | (none)  | Definition of high threshold and associated properties. |
+
+*highthreshold* and *lowthreshold* each have the following properties.
+
+| Property            | Default  | Description |
+| :------------------ | :------- | :-----------|
+| value               | (none)   | Threshold value. |
+| message             | ""       | Notification message value. |
+| state               | "normal" | Notification state property value. |
+| method              | []       | Notification method property value. |
+
+Any of the following tokens may be used in the supplied *message* text
+and will be interpolated with the described value when the notification
+message is composed.
+
+_${path}_ will be replaced by the value of *triggerpath*.
 
 _${test}_ will be replaced by one of "above", "below" or "between"
 dependant upon the threshold being crossed and the direction of
