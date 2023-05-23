@@ -1,10 +1,15 @@
 # pdjr-skplugin-threshold-notifier
 
-Raise notifications based on some path value.
+Raise notifications based on path values.
 
 __pdjr-skplugin-threshold-notifier__ compares the real-time values of
 one or more keys against user-defined thresholds and raises Signal K
 notifications if these limits are encountered.
+
+Each value to be monitored is compared against two threshold values
+, *highthreshold* and *lowthreshold*, which define upper and lower
+value limits.
+The value is judged to be 
 
 ## Operating principle
 
