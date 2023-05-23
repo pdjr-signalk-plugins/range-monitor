@@ -30,6 +30,11 @@ const PLUGIN_SCHEMA = {
         "title": "Rule",
         "type": "object",
         "properties": {
+          "enabled": {
+            "title": "Enable rule?",
+            "type": "boolean",
+            "default": true
+          },
           "triggerpath": {
             "title": "Monitored path",
             "type": "string"
@@ -38,70 +43,92 @@ const PLUGIN_SCHEMA = {
             "title": "Notification path",
             "type": "string"
           },
-          "enabled": {
-            "title": "Enable rule?",
-            "type": "boolean",
-            "default": true
-          },
           "lowthreshold": {
-            "title": "",
-            "type": "object",
-            "properties": {
-              "value": {
-                "title": "Low threshold",
-                "type": "number"
-              },                        
-              "message": {
-                "title": "Notification message",
-                "type": "string",
-                "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
-              },
-              "state": {
-                "title": "Alarm state",
-                "type": "string",
-                "default": "alert",
-                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
-              },
-              "method": {
-                "title": "Suggested method",
-                "type": "array",
-                "default": [],
-                "items": {
-                  "type": "string",
-                  "enum": [ "visual", "sound" ]
-                },
-                "uniqueItems": true
-              }
-            }
+            "type": "number"
           },
           "highthreshold": {
-            "title": "",
+            "type": "number"
+          },
+          "notifications" : {
             "type": "object",
             "properties": {
-              "value": {
-                "title": "High threshold",
-                "type": "number"
-              },                        
-              "message": {
-                "title": "Notification message",
-                "type": "string",
-                "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+              "nominal": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "title": "Notification message",
+                    "type": "string",
+                    "default": "${vessel}: ${path} is nominal"
+                  },
+                  "state": {
+                    "title": "Alarm state",
+                    "type": "string",
+                    "default": "normal",
+                    "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+                  },
+                  "method": {
+                    "title": "Suggested method",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                      "type": "string",
+                      "enum": [ "visual", "sound" ]
+                    },
+                    "uniqueItems": true
+                  }
+                }
               },
-              "state": {
-                "title": "Alarm state",
-                "type": "string",
-                "default": "alert",
-                "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+              "lowtransit": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "title": "Notification message",
+                    "type": "string",
+                    "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+                  },
+                  "state": {
+                    "title": "Alarm state",
+                    "type": "string",
+                    "default": "alert",
+                    "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+                  },
+                  "method": {
+                    "title": "Suggested method",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                      "type": "string",
+                      "enum": [ "visual", "sound" ]
+                    },
+                    "uniqueItems": true
+                  }
+                }
               },
-              "method": {
-                "title": "Suggested method",
-                "type": "array",
-                "default": [],
-                "items": {
-                  "type": "string",
-                  "enum": [ "visual", "sound" ]
-                },
-                "uniqueItems": true
+              "hightransit": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "title": "Notification message",
+                    "type": "string",
+                    "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+                  },
+                  "state": {
+                    "title": "Alarm state",
+                    "type": "string",
+                    "default": "alert",
+                    "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
+                  },
+                  "method": {
+                    "title": "Suggested method",
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                      "type": "string",
+                      "enum": [ "visual", "sound" ]
+                    },
+                    "uniqueItems": true
+                  }
+                }
               }
             }
           }
@@ -144,47 +171,34 @@ module.exports = function(app) {
     if ((options.rules) && (Array.isArray(options.rules))) {
       options.rules = options.rules.filter(rule => rule.enabled);
       if (options.rules.length > 0) {
-        if (options.rules.length == 1) {
-          log.N("applying threshold rule to '%s'", options.rules[0].triggerpath);
-        } else {
-          log.N("applying multiple threshold rules (see log for details).");
-          options.rules.forEach(rule => { log.N("applying threshold rule to '%s'", rule.triggerpath, false); } );
-        }
+        log.N("monitoring %d trigger path%s.", options.rules.length, (options.rules.length == 1)?"":"s");
+        options.rules.forEach(rule => { log.N("monitoring trigger path '%s'", rule.triggerpath, false); } );
 
-        unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold }) => {
+        unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
           var stream = app.streambundle.getSelfStream(triggerpath);
           a.push(stream.map(value => {
-            var retval = 0;
-            if (lowthreshold) lowthreshold['actual'] = value;
-            if (highthreshold) highthreshold['actual'] = value;
-            if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold.value)) {
-              retval = -1;
-            } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold.value)) {
-              retval = 1;
+            notifications.value = value;
+            if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold)) {
+              return(-1);
+            } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold)) {
+              return(1);
             }
-            return(retval);
-          }).skipDuplicates().onValue(test => {
-            var nactual = (lowthreshold)?lowthreshold.actual:highthreshold.actual;
-            if (test == 0) {
-              var noti = app.getSelfPath(notificationpath);
-              if (noti != null) {
-                //log.N(nactual + " => cancelling '" + noti.value.state + "' notification on '" + npath + "'", false);
-                //cancelNotification(npath);
-              }
-            } else {
-              var nstate = (test == -1)?lowthreshold.state:highthreshold.state;
-              log.N(nactual + " => issuing '" + nstate + "' notification on '" + notificationpath + "'");
-              delta.clear().addValue(notificationpath, {
-                "message": nstate.message,
-                "state": ((test == 1)?highthreshold:lowthreshold).state,
-                "method": ((test == 1)?highthreshold:lowthreshold).method
-              }).commit();
+            return(0);
+          }).skipDuplicates().onValue(comparison => {
+            var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
+            if (notification) {
+              notification.message = notification.message
+              .replace(/\${path}/g, triggerpath)
+              .replace(/\${test}/g, test)
+              .replace(/\${threshold}/g, threshold)
+              .replace(/\${value}/g, value);
+              log.N("issuing '%s' notification on '%s'" + notification.state, notificationpath);
+              delta.clear().addValue(notificationpath, notification).commit();
             }
-          }));
-          return(a);
+          }))
         }, []);
       } else {
-        log.N("stopped: configuration includes no rules");
+        log.N("stopped: configuration includes no active rules");
       }
     } else {
       log.N("stopped: configuration 'rules' entry is invalid");

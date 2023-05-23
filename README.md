@@ -39,14 +39,25 @@ Each *rule* object has the following properties.
 | triggerpath         | (none)  | Path which should be monitored. |
 | notificationpath    | (none)  | Path on which notifications should be issued when the *triggerpath* value transits a threshold. |
 | enabled             | true    | Boolean property enabling or disabling the rule. |
-| lowthreshold        | (none)  | Definition of low threshold and associated properties. |
-| highthreshold       | (none)  | Definition of high threshold and associated properties. |
+| lowthreshold        | (none)  | The low threshold against which *triggerpath* value should be compared. |
+| highthreshold       | (none)  | The high threshold against which *triggerpath* value should be compared. |
+| notifications       | {}      | Definition of the types of notification to be raised under different comparison outcomes. |
 
-*highthreshold* and *lowthreshold* each have the following properties.
+The *notifications* object may contain up to three object properties
+each of which defines a notification which will be issued when the
+*triggerpath* value is compared to *lowthreshold* and *highthreshold*.
+
+The **nominal** object will be applied when *value* falls between
+*lowthreshold* and *highthreshold*.
+The **hightransit** object will be applied when *value* makes an
+excursion above *highthreshold*.
+The **lowtransit** object will be applied when *value* makes an
+excursion below *lowthreshold*.
+
+Each object property in *notifications* has the following properties. 
 
 | Property            | Default  | Description |
 | :------------------ | :------- | :-----------|
-| value               | (none)   | Threshold value. |
 | message             | ""       | Notification message value. |
 | state               | "normal" | Notification state property value. |
 | method              | []       | Notification method property value. |
