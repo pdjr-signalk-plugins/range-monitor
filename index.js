@@ -58,7 +58,7 @@ const PLUGIN_SCHEMA = {
                   "message": {
                     "title": "Notification message",
                     "type": "string",
-                    "default": "${vessel}: ${path} is nominal"
+                    "default": "${path} is nominal (${value})"
                   },
                   "state": {
                     "title": "Alarm state",
@@ -84,7 +84,7 @@ const PLUGIN_SCHEMA = {
                   "message": {
                     "title": "Notification message",
                     "type": "string",
-                    "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+                    "default": "${path} is ${test} ${threshold} (${value})"
                   },
                   "state": {
                     "title": "Alarm state",
@@ -110,7 +110,7 @@ const PLUGIN_SCHEMA = {
                   "message": {
                     "title": "Notification message",
                     "type": "string",
-                    "default": "${vessel}: ${path} is ${test} ${threshold} (${value})"
+                    "default": "${path} is ${test} ${threshold} (${value})"
                   },
                   "state": {
                     "title": "Alarm state",
@@ -177,25 +177,33 @@ module.exports = function(app) {
         unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
           var stream = app.streambundle.getSelfStream(triggerpath);
           a.push(stream.map(value => {
+            var retval = 0;
             notifications.value = value;
-            if ((lowthreshold) && (lowthreshold.value) && (value < lowthreshold)) {
-              return(-1);
-            } else if ((highthreshold) && (highthreshold.value) && (value > highthreshold)) {
-              return(1);
+            notifications.test = "between";
+            notifications.threshold = lowthreshold + " and " + highthreshold;
+            if ((lowthreshold) && (value < lowthreshold)) {
+              retval = -1;
+              notifications.test = "below";
+              notifications.threshold = lowthreshold;
+            } else if ((highthreshold) && (value > highthreshold)) {
+              retval = 1;
+              notifications.test = "above"
+              notifications.threshold = highthreshold;
             }
-            return(0);
+            return(retval);
           }).skipDuplicates().onValue(comparison => {
             var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
             if (notification) {
               notification.message = notification.message
               .replace(/\${path}/g, triggerpath)
-              .replace(/\${test}/g, test)
-              .replace(/\${threshold}/g, threshold)
-              .replace(/\${value}/g, value);
-              log.N("issuing '%s' notification on '%s'" + notification.state, notificationpath);
+              .replace(/\${test}/g, notifications.test)
+              .replace(/\${threshold}/g, notifications.threshold)
+              .replace(/\${value}/g, notifications.value);
+              log.N("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
               delta.clear().addValue(notificationpath, notification).commit();
             }
-          }))
+          }));
+          return(a);
         }, []);
       } else {
         log.N("stopped: configuration includes no active rules");

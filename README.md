@@ -15,16 +15,13 @@ and lower thresholds.
 The plugin subscribes to each of the defined *triggerpath*s and
 checks each incoming value against the defined thresholds.
 
-When a value transits its upper threshold then a notification is
-published on *notificationpath* using properties defined for an upper
-threshold excursion.
-When a value transits its lower threshold then a notification is
-published on *notificationpath* using properties defined for a lower
-threshold excursion.
+The position of a value relative to its thresholds (i.e. above, below
+or between) results in an appropriate notification being published on
+*notificationpath* using properties defined by the user.
 
-A difference between the two notification property values can be used
-by a consumer to take actions which are initiated by one excursion and
-cancelled by the other - one example might be the control of a
+Differences between the two various notification property values can be
+used by a consumer to take actions which are initiated by one excursion
+and cancelled by the other - one example might be the control of a
 discharge pump.
 
 ## Configuration
@@ -80,10 +77,10 @@ and _m_ is the high threshold.
 _${value}_ will be replaced with the instantaneous value of the
 monitored path that triggered the rule.
 
-_${vessel}_ will be replaced with Signal K's idea of the vessel name.
-
-An example message text might be "${vessel}: ${path} is ${test}
-${threshold} (currently ${value})".
+An example message text might be:
+```
+"${path} is ${test} ${threshold} (currently ${value})"
+```
 
 ## Reference configuration
 ```
@@ -94,20 +91,22 @@ ${threshold} (currently ${value})".
   "configuration": {
     "rules": [
       {
+        "enabled": true,
         "triggerpath": "tanks.wasteWater.0.currentLevel",
         "notificationpath": "notifications.tanks.wasteWater.0.currentLevel.override",
-        "enabled": true,
-        "highthreshold": {
-          "value": 0.3,
-          "message": "waste water level is ${comp} ${threshold}: ${action} discharge pump",
-          "state": "alert",
-          "method": [ "visual" ]
-        },
-        "lowthreshold": {
-          "value": 0.05,
-          "message": "waste water level is ${comp} ${threshold}: ${action} discharge pump",
-          "state": "normal",
-          "method": []
+        "highthreshold": 0.5,
+        "lowthreshold": 0.05,
+        "notifications": {
+          "hightransit": {
+            "message": "waste water level is ${comp} ${threshold}",
+            "state": "alert",
+            "method": []
+          },
+          "lowtransit": {
+            "message": "waste water level is ${comp} ${threshold}",
+            "state": "normal",
+            "method": []
+          }
         }
       }
     ]
