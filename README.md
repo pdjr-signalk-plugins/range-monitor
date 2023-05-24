@@ -2,39 +2,31 @@
 
 Raise notifications based on path values.
 
-__pdjr-skplugin-threshold-notifier__ compares the real-time values of
-one or more keys against user-defined thresholds and raises Signal K
-notifications if these limits are encountered.
+## Description
 
-Each value to be monitored is compared against two threshold values
-, *highthreshold* and *lowthreshold*, which define upper and lower
-value limits.
-The value is judged to be 
+**pdjr-skplugin-threshold-notifier** operates one or more user-defined
+*rule*s.
+Each rule specifies a Signal K path value, a pair of thresholds and
+up to three notifications specifications.
+The thresholds define a 'nominal' range for the value and the plugin
+will issue notifications when the monitored value becomes nominal
+and/or when it makes an excursion through a threshold.
 
-## Operating principle
+Differences between the various notification property values can be
+used to signal actions which are initiated by one excursion and
+cancelled by another: perhaps the control of a discharge pump or the
+monitoring of engine temperature or sensor state.
 
-__pdjr-skplugin-threshold-notifier__ processes a collection of *rules*
-each of which defines a *triggerpath*, a *notificationpath* and upper
-and lower thresholds.
+## Configuration (schema version 3)
 
-The plugin subscribes to each of the defined *triggerpath*s and
-checks each incoming value against the defined thresholds.
+The plugin configuration file has two required properties.
 
-The position of a value relative to its thresholds (i.e. above, below
-or between) results in an appropriate notification being published on
-*notificationpath* using properties defined by the user.
+| Property            | Default | Description |
+| :------------------ | :------ | :-----------|
+| version             | "3.0.0" | The configuration file schema version. |
+| rules               | []      | Array of rule definition objects.
 
-Differences between the two various notification property values can be
-used by a consumer to take actions which are initiated by one excursion
-and cancelled by the other - one example might be the control of a
-discharge pump.
-
-## Configuration
-
-The plugin configuration file consists of a single *rules* array
-property consisting of zero or more threshold *rule* objects.
-
-Each *rule* object has the following properties.
+Each *rule* definition object has the following properties.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
@@ -45,18 +37,18 @@ Each *rule* object has the following properties.
 | highthreshold       | (none)  | The high threshold against which *triggerpath* value should be compared. |
 | notifications       | {}      | Definition of the types of notification to be raised under different comparison outcomes. |
 
-The *notifications* object may contain up to three object properties
-each of which defines a notification which will be issued when the
-*triggerpath* value is compared to *lowthreshold* and *highthreshold*.
+The *notifications* object has the following optional object
+properties.
 
-The **nominal** object will be applied when *value* falls between
-*lowthreshold* and *highthreshold*.
-The **hightransit** object will be applied when *value* makes an
-excursion above *highthreshold*.
-The **lowtransit** object will be applied when *value* makes an
-excursion below *lowthreshold*.
+| Property            | Default | Description |
+| :------------------ | :------ | :-----------|
+| nominal             | (none)  | Object defining a notification that will be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
+| hightransit         | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
+excursion above *highthreshold*. |
+| lowtransit          | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
+excursion below *lowthreshold*. |
 
-Each object property in *notifications* has the following properties. 
+*nominal*, *hightransit* and *lowtransit* objects have the following properties.
 
 | Property            | Default  | Description |
 | :------------------ | :------- | :-----------|
@@ -82,39 +74,6 @@ and _m_ is the high threshold.
 _${value}_ will be replaced with the instantaneous value of the
 monitored path that triggered the rule.
 
-An example message text might be:
-```
-"${path} is ${test} ${threshold} (currently ${value})"
-```
+## Author
 
-## Reference configuration
-```
-{
-  "enabled": true,
-  "enableLogging": false,
-  "enableDebug": false,
-  "configuration": {
-    "rules": [
-      {
-        "enabled": true,
-        "triggerpath": "tanks.wasteWater.0.currentLevel",
-        "notificationpath": "notifications.tanks.wasteWater.0.currentLevel.override",
-        "highthreshold": 0.5,
-        "lowthreshold": 0.05,
-        "notifications": {
-          "hightransit": {
-            "message": "waste water level is ${comp} ${threshold}",
-            "state": "alert",
-            "method": []
-          },
-          "lowtransit": {
-            "message": "waste water level is ${comp} ${threshold}",
-            "state": "normal",
-            "method": []
-          }
-        }
-      }
-    ]
-  }
-}
-```
+Paul Reeve <*preeve_at_pdjr_dot_eu*>
