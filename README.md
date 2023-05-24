@@ -6,16 +6,15 @@ Raise notifications based on path values.
 
 **pdjr-skplugin-threshold-notifier** operates one or more user-defined
 *rule*s.
-Each rule specifies a Signal K path value, a pair of thresholds and
-up to three notifications specifications.
-The thresholds define a 'nominal' range for the value and the plugin
-will issue notifications when the monitored value becomes nominal
-and/or when it makes an excursion through a threshold.
+Each rule specifies a Signal K path *value*, a pair of *threshold*s
+and up to three *notification* specifications.
+The *threshold*s define a 'nominal' range and the plugin will issue
+a *notification*, if one is defined, when *value* enters the nominal
+range and when it makes an excursion through a threshold.
 
 Differences between the various notification property values can be
-used to signal actions which are initiated by one excursion and
-cancelled by another: perhaps the control of a discharge pump or the
-monitoring of engine temperature or sensor state.
+used to signal actions: perhaps the control of a discharge pump or the
+monitoring of an engine or other sensor state.
 
 ## Configuration (schema version 3)
 
