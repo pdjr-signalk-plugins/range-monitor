@@ -195,13 +195,14 @@ module.exports = function(app) {
               return(retval);
             }).skipDuplicates().onValue(comparison => {
               var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
-              if (notification) {
+              if ((notification) && (notification != notifications.lastNotification)) {
                 notification.message = notification.message
                 .replace(/\${path}/g, triggerpath)
                 .replace(/\${test}/g, notifications.test)
                 .replace(/\${threshold}/g, notifications.threshold)
                 .replace(/\${value}/g, notifications.value);
                 log.N("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
+                notifications.lastNotification = notification;
                 delta.clear().addValue(notificationpath, notification).commit();
               }
             }));
