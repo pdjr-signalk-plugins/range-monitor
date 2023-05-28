@@ -196,7 +196,7 @@ module.exports = function(app) {
               .replace(/\${test}/g, notifications.test)
               .replace(/\${threshold}/g, notifications.threshold)
               .replace(/\${value}/g, notifications.value);
-              log.N("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
+              app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
               notifications.lastNotification = notification;
               delta.clear().addValue(notificationpath, notification).commit();
             }
