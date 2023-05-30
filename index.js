@@ -178,6 +178,7 @@ module.exports = function(app) {
             notifications.value = value;
             notifications.test = "between";
             notifications.threshold = lowthreshold + " and " + highthreshold;
+            app.debug("lowt = %d, hight = %d, value = %d", lowthreshold, highthreshold, value);
             if ((lowthreshold) && (value < lowthreshold)) {
               retval = -1;
               notifications.test = "below";
@@ -189,14 +190,19 @@ module.exports = function(app) {
             }
             return(retval);
           }).skipDuplicates().onValue(comparison => {
+            app.debug("comparison on %s yields %d", triggerpath, comparison);
             var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
-            if ((notification) && (notification != notifications.lastNotification)) {
-              notification.message = notification.message
-              .replace(/\${path}/g, triggerpath)
-              .replace(/\${test}/g, notifications.test)
-              .replace(/\${threshold}/g, notifications.threshold)
-              .replace(/\${value}/g, notifications.value);
-              app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
+            if ((notification !== undefined) && (notification != notifications.lastNotification)) {
+              if (notification === null) {
+                app.debug("deleting notification on \'%s\'", notificationpath);
+              } else {
+                notification.message = notification.message
+                .replace(/\${path}/g, triggerpath)
+                .replace(/\${test}/g, notifications.test)
+                .replace(/\${threshold}/g, notifications.threshold)
+                .replace(/\${value}/g, notifications.value);
+                app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
+              }
               notifications.lastNotification = notification;
               delta.clear().addValue(notificationpath, notification).commit();
             }
