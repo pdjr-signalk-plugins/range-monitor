@@ -30,11 +30,6 @@ const PLUGIN_SCHEMA = {
         "title": "Rule",
         "type": "object",
         "properties": {
-          "enabled": {
-            "title": "Enable rule?",
-            "type": "boolean",
-            "default": true
-          },
           "triggerpath": {
             "title": "Monitored path",
             "type": "string"
@@ -135,15 +130,13 @@ const PLUGIN_SCHEMA = {
         }
       }
     }
+  },
+  "default": {
+    "rules": [
+    ]
   }
 };
 const PLUGIN_UISCHEMA = {};
-
-const OPTIONS_DEFAULT = {
-  "rules": []
-};
-
-const OPTIONS_SUPPORTED_VERSIONS = [ "3.0.0" ];
 
 module.exports = function(app) {
   var plugin = {};
@@ -161,59 +154,54 @@ module.exports = function(app) {
   plugin.start = function(options) {
 
     if (Object.keys(options).length === 0) {
-      log.N("plugin configuration file missing or broken.");
-      options = OPTIONS_DEFAULT;
+      options = plugin.schema.default;
+      log.W("using default configuratiom");
     }
 
-    if ((options.rules) && (Array.isArray(options.rules))) {
-      options.rules = options.rules.filter(rule => rule.enabled);
-      if (options.rules.length > 0) {
-        log.N("started: monitoring %d trigger path%s (see log for details).", options.rules.length, (options.rules.length == 1)?"":"s");
-        options.rules.forEach(rule => { log.N("monitoring trigger path '%s'", rule.triggerpath, false); } );
+    if ((options.rules) && (Array.isArray(options.rules)) && (options.rules.length > 0)) {
+      log.N("started: monitoring %d trigger path%s (see log for details).", options.rules.length, (options.rules.length == 1)?"":"s");
+      options.rules.forEach(rule => { log.N("monitoring trigger path '%s'", rule.triggerpath, false); } );
 
-        unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
-          var stream = app.streambundle.getSelfStream(triggerpath);
-          a.push(stream.map(value => {
-            var retval = 0;
-            notifications.value = value;
-            notifications.test = "between";
-            notifications.threshold = lowthreshold + " and " + highthreshold;
-            app.debug("lowt = %d, hight = %d, value = %d", lowthreshold, highthreshold, value);
-            if ((lowthreshold) && (value < lowthreshold)) {
-              retval = -1;
-              notifications.test = "below";
-              notifications.threshold = lowthreshold;
-            } else if ((highthreshold) && (value >= highthreshold)) {
-              retval = 1;
-              notifications.test = "above"
-              notifications.threshold = highthreshold;
+      unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
+        var stream = app.streambundle.getSelfStream(triggerpath);
+        a.push(stream.map(value => {
+          var retval = 0;
+          notifications.value = value;
+          notifications.test = "between";
+          notifications.threshold = lowthreshold + " and " + highthreshold;
+          app.debug("lowt = %d, hight = %d, value = %d", lowthreshold, highthreshold, value);
+          if ((lowthreshold) && (value < lowthreshold)) {
+            retval = -1;
+            notifications.test = "below";
+            notifications.threshold = lowthreshold;
+          } else if ((highthreshold) && (value >= highthreshold)) {
+            retval = 1;
+            notifications.test = "above"
+            notifications.threshold = highthreshold;
+          }
+          return(retval);
+        }).skipDuplicates().onValue(comparison => {
+          app.debug("comparison on %s yields %d", triggerpath, comparison);
+          var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
+          if ((notification !== undefined) && (notification != notifications.lastNotification)) {
+            if (notification === null) {
+              app.debug("deleting notification on \'%s\'", notificationpath);
+            } else {
+              notification.message = notification.message
+              .replace(/\${path}/g, triggerpath)
+              .replace(/\${test}/g, notifications.test)
+              .replace(/\${threshold}/g, notifications.threshold)
+              .replace(/\${value}/g, notifications.value);
+              app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
             }
-            return(retval);
-          }).skipDuplicates().onValue(comparison => {
-            app.debug("comparison on %s yields %d", triggerpath, comparison);
-            var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
-            if ((notification !== undefined) && (notification != notifications.lastNotification)) {
-              if (notification === null) {
-                app.debug("deleting notification on \'%s\'", notificationpath);
-              } else {
-                notification.message = notification.message
-                .replace(/\${path}/g, triggerpath)
-                .replace(/\${test}/g, notifications.test)
-                .replace(/\${threshold}/g, notifications.threshold)
-                .replace(/\${value}/g, notifications.value);
-                app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
-              }
-              notifications.lastNotification = notification;
-              delta.clear().addValue(notificationpath, notification).commit();
-            }
-          }));
-          return(a);
-        }, []);
-      } else {
-        log.W("stopped: configuration includes no active rules.");
-      }
+            notifications.lastNotification = notification;
+            delta.clear().addValue(notificationpath, notification).commit();
+          }
+        }));
+        return(a);
+      }, []);
     } else {
-      log.E("stopped: configuration error.");
+      log.N("stopped: missing, bad or empty configuration.");
     }
   }
 

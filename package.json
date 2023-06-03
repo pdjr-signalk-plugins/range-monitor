@@ -1,11 +1,10 @@
 {
   "name": "pdjr-skplugin-threshold-notifier",
-  "version": "3.1.1",
-  "description": "Raise notifications based on some path value",
+  "version": "4.0.0",
+  "description": "Raise notifications based on value ranges.",
   "main": "index.js",
   "signalk-plugin-enabled-by-default": true,
   "dependencies": {
-    "baconjs": "^1.0.1",
     "sprintf-js": "^1.1.2"
   },
   "scripts": {
