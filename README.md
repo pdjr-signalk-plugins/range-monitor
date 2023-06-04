@@ -1,10 +1,10 @@
-# pdjr-skplugin-rangenotifier
+# pdjr-skplugin-range-notifier
 
 Raise notifications based on value ranges.
 
 ## Description
 
-**pdjr-skplugin-rangenotifier** operates one or more user-defined
+**pdjr-skplugin-range-notifier** operates one or more user-defined
 *rule*s.
 Each rule specifies a Signal K *path*, a pair of *threshold*s
 and some *notification*s.
