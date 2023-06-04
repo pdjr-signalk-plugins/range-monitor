@@ -1,7 +1,7 @@
 {
-  "name": "pdjr-skplugin-threshold-notifier",
-  "version": "4.0.0",
-  "description": "Raise notifications based on threshold ranges",
+  "name": "pdjr-skplugin-range-notifier",
+  "version": "1.0.0",
+  "description": "Raise notifications based on value ranges",
   "main": "index.js",
   "signalk-plugin-enabled-by-default": true,
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pdjr-signalk/pdjr-skplugin-threshold-notifier.git"
+    "url": "git+https://github.com/pdjr-signalk/pdjr-skplugin-range-notifier.git"
   },
   "keywords": [
     "signalk-node-server-plugin",
@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/pdjr-signalk/pdjr-skplugin-threshold-notifier/issues"
   },
-  "homepage": "https://github.com/pdjr-signalk/pdjr-skplugin-threshold-notifier#readme",
+  "homepage": "https://github.com/pdjr-signalk/pdjr-skplugin-range-notifier#readme",
   "dependencies": {
     "sprintf-js": "^1.1.2"
   },

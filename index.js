@@ -17,15 +17,15 @@
 const Delta = require('./lib/signalk-libdelta/Delta.js');
 const Log = require('./lib/signalk-liblog/Log.js');
 
-const PLUGIN_ID = "threshold-notifier";
-const PLUGIN_NAME = "pdjr-skplugin-threshold-notifier";
-const PLUGIN_DESCRIPTION = "Raise notifications based on some path value.";
+const PLUGIN_ID = "range-notifier";
+const PLUGIN_NAME = "pdjr-skplugin-range-notifier";
+const PLUGIN_DESCRIPTION = "Raise notifications based on value ranges.";
 const PLUGIN_SCHEMA = {
   "type": "object",
   "properties": {
     "rules": {
       "type": "array",
-      "title": "",
+      "title": "Rules",
       "items": {
         "title": "Rule",
         "type": "object",
@@ -47,7 +47,7 @@ const PLUGIN_SCHEMA = {
           "notifications" : {
             "type": "object",
             "properties": {
-              "nominal": {
+              "inrange": {
                 "type": "object",
                 "properties": {
                   "message": {
@@ -182,7 +182,7 @@ module.exports = function(app) {
           return(retval);
         }).skipDuplicates().onValue(comparison => {
           app.debug("comparison on %s yields %d", triggerpath, comparison);
-          var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.nominal);
+          var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.inrange);
           if ((notification !== undefined) && (notification != notifications.lastNotification)) {
             if (notification === null) {
               app.debug("deleting notification on \'%s\'", notificationpath);
