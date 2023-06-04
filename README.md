@@ -1,16 +1,16 @@
-# pdjr-skplugin-threshold-notifier
+# pdjr-skplugin-rangenotifier
 
 Raise notifications based on value ranges.
 
 ## Description
 
-**pdjr-skplugin-threshold-notifier** operates one or more user-defined
+**pdjr-skplugin-rangenotifier** operates one or more user-defined
 *rule*s.
-Each rule specifies a Signal K path *value*, a pair of *threshold*s
-and up to three *notification*s.
-The *threshold*s define a 'nominal' range and the plugin will issue
-a *notification*, if one is defined, when *value* enters the nominal
-range and when it makes an excursion through a threshold.
+Each rule specifies a Signal K *path*, a pair of *threshold*s
+and some *notification*s.
+The *threshold*s define a range and the plugin will issue a
+*notification*, if one is defined, when the *path* value enters and
+leaves the specified range.
 
 Differences between the various notification property values can be
 used to signal actions: perhaps the control of a discharge pump or the
@@ -18,11 +18,10 @@ monitoring of an engine or other sensor state.
 
 ## Configuration
 
-The plugin configuration file has two required properties.
+The plugin configuration file has a single property.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
-| version             | "3.0.0" | The configuration file schema version. |
 | rules               | []      | Array of rule definition objects.
 
 Each *rule* definition object has the following properties.
@@ -31,7 +30,6 @@ Each *rule* definition object has the following properties.
 | :------------------ | :------ | :-----------|
 | triggerpath         | (none)  | Path which should be monitored. |
 | notificationpath    | (none)  | Path on which notifications should be issued when the *triggerpath* value transits a threshold. |
-| enabled             | true    | Boolean property enabling or disabling the rule. |
 | lowthreshold        | (none)  | The low threshold against which *triggerpath* value should be compared. |
 | highthreshold       | (none)  | The high threshold against which *triggerpath* value should be compared. |
 | notifications       | {}      | Definition of the types of notification to be raised under different comparison outcomes. |
@@ -41,7 +39,7 @@ properties.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
-| nominal             | (none)  | Object defining a notification that will be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
+| inrange             | (none)  | Object defining a notification that will be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
 | hightransit         | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
 excursion above *highthreshold*. |
 | lowtransit          | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
@@ -51,7 +49,7 @@ excursion below *lowthreshold*. |
 
 | Property            | Default  | Description |
 | :------------------ | :------- | :-----------|
-| message             | ""       | Notification message value. |
+| message             | ""       | Notification message property value. |
 | state               | "normal" | Notification state property value. |
 | method              | []       | Notification method property value. |
 
@@ -65,13 +63,13 @@ _${test}_ will be replaced by one of "above", "below" or "between"
 dependant upon the threshold being crossed and the direction of
 crossing.
 
-_${threshold}_ will be replaced with the __value__ of the threshold
+_${threshold}_ will be replaced with the value of the threshold
 triggering the rule or, in the case of the path value being between
 thresholds with the string "_n_ and _m_" where _n_ is the low threshold
 and _m_ is the high threshold.
 
 _${value}_ will be replaced with the instantaneous value of the
-monitored path that triggered the rule.
+path that triggered the rule.
 
 ## Author
 
