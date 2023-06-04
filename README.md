@@ -18,6 +18,9 @@ monitoring of an engine or other sensor state.
 
 ## Configuration
 
+The plugin includes an embedded default configuration which should be
+updated to include some rules.
+
 The plugin configuration file has a single property.
 
 | Property            | Default | Description |
@@ -32,17 +35,17 @@ Each *rule* definition object has the following properties.
 | notificationpath    | (none)  | Path on which notifications should be issued when the *triggerpath* value transits a threshold. |
 | lowthreshold        | (none)  | The low threshold against which *triggerpath* value should be compared. |
 | highthreshold       | (none)  | The high threshold against which *triggerpath* value should be compared. |
-| notifications       | {}      | Definition of the types of notification to be raised under different comparison outcomes. |
+| notifications       | {}      | Definitions of the notifications to be raised under different comparison outcomes. |
 
 The *notifications* object has the following optional object
 properties.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
-| inrange             | (none)  | Object defining a notification that will be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
-| hightransit         | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
+| inrange             | (none)  | Object defining the notification to be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
+| hightransit         | (none)  | Object defining the notification to be issued when *triggerpath* value makes an
 excursion above *highthreshold*. |
-| lowtransit          | (none)  | Object defining a notification that will be issued when *triggerpath* value makes an
+| lowtransit          | (none)  | Object defining the notification to be issued when *triggerpath* value makes an
 excursion below *lowthreshold*. |
 
 *nominal*, *hightransit* and *lowtransit* objects have the following properties.
@@ -70,6 +73,10 @@ and _m_ is the high threshold.
 
 _${value}_ will be replaced with the instantaneous value of the
 path that triggered the rule.
+
+## Operation
+
+The plugin starts automatically once installed, but will not operate until it has been configured.
 
 ## Author
 
