@@ -6,8 +6,9 @@ Raise notifications based on value ranges.
 
 **pdjr-skplugin-range-notifier** operates one or more user-defined
 *rule*s.
-Each rule specifies a Signal K *path*, a pair of *threshold*s
-and some *notification*s.
+
+Each rule specifies a Signal K *path*, a pair of *threshold*s and some
+*notification*s.
 The *threshold*s define a range and the plugin will issue a
 *notification*, if one is defined, when the *path* value enters and
 leaves the specified range.
@@ -18,27 +19,23 @@ monitoring of an engine or other sensor state.
 
 ## Configuration
 
-The plugin includes an embedded default configuration which should be
-updated to include some rules.
-
 The plugin configuration file has a single property.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
-| rules               | []      | Array of rule definition objects.
+| rules               | (none)  | Required array of *rule* objects. |
 
-Each *rule* definition object has the following properties.
+Each *rule* object has the following properties.
 
-| Property            | Default | Description |
-| :------------------ | :------ | :-----------|
-| triggerpath         | (none)  | Path which should be monitored. |
-| notificationpath    | (none)  | Path on which notifications should be issued when the *triggerpath* value transits a threshold. |
-| lowthreshold        | (none)  | The low threshold against which *triggerpath* value should be compared. |
-| highthreshold       | (none)  | The high threshold against which *triggerpath* value should be compared. |
-| notifications       | {}      | Definitions of the notifications to be raised under different comparison outcomes. |
+| Property            | Default                     | Description |
+| :------------------ | :-------------------------- | :-----------|
+| triggerpath         | (none)                      | Required path which should be monitored. |
+| lowthreshold        | (none)                      | Required low threshold against which *triggerpath* value should be compared. |
+| highthreshold       | (none)                      | Required high threshold against which *triggerpath* value should be compared. |
+| notificationpath    | notifications.*triggerpath* | Optional path on which notifications should be issued when the *triggerpath* value transits a threshold. |
+| notifications       | {}                          | Optional definitions of the notifications to be raised under different comparison outcomes. |
 
-The *notifications* object has the following optional object
-properties.
+The *notifications* object has the following properties.
 
 | Property            | Default | Description |
 | :------------------ | :------ | :-----------|
@@ -76,7 +73,7 @@ path that triggered the rule.
 
 ## Operation
 
-The plugin starts automatically once installed, but will not operate until it has been configured.
+The plugin must be configured before it can enter production.
 
 ## Author
 

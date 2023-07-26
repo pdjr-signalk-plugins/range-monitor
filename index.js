@@ -34,15 +34,15 @@ const PLUGIN_SCHEMA = {
             "title": "Monitored path",
             "type": "string"
           },
-          "notificationpath": {
-            "title": "Notification path",
-            "type": "string"
-          },
           "lowthreshold": {
             "type": "number"
           },
           "highthreshold": {
             "type": "number"
+          },
+          "notificationpath": {
+            "title": "Notification path",
+            "type": "string"
           },
           "notifications" : {
             "type": "object",
@@ -130,10 +130,6 @@ const PLUGIN_SCHEMA = {
         }
       }
     }
-  },
-  "default": {
-    "rules": [
-    ]
   }
 };
 const PLUGIN_UISCHEMA = {};
@@ -153,55 +149,70 @@ module.exports = function(app) {
 
   plugin.start = function(options) {
 
-    if (Object.keys(options).length === 0) {
-      options = plugin.schema.default;
-      log.W("using default configuratiom");
-    }
+    if (Object.keys(options).length > 0) {
+      if ((options.rules) && (Array.isArray(options.rules))) {
 
-    if ((options.rules) && (Array.isArray(options.rules)) && (options.rules.length > 0)) {
-      log.N("started: monitoring %d trigger path%s (see log for details).", options.rules.length, (options.rules.length == 1)?"":"s");
-      options.rules.forEach(rule => { log.N("monitoring trigger path '%s'", rule.triggerpath, false); } );
+        options.rules = options.rules.filter(rule => {
+          if ((rule.triggerpath) && (rule.lowthreshold) && (rule.highthreshold)) {
+            rule.notificationpath = (rule.notificationpath)?rule.notificationpath:("notifications." + rule.triggerpath);
+            rule.notifications = (rule.notifications)?rule.notifications:{};
+            return(true);
+          } else {
+            log.W("ignoring malformed rule (%s)", JSON.stringify(rule), false);
+            return(false);
+          }
+        });
+        
+        if (options.rules.length > 0) {
+          log.N("monitoring %d trigger path%s.", options.rules.length, (options.rules.length == 1)?"":"s");
+          options.rules.forEach(rule => { app.debug("monitoring trigger path '%s'", rule.triggerpath); } );
 
-      unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
-        var stream = app.streambundle.getSelfStream(triggerpath);
-        a.push(stream.map(value => {
-          var retval = 0;
-          notifications.value = value;
-          notifications.test = "between";
-          notifications.threshold = lowthreshold + " and " + highthreshold;
-          app.debug("lowt = %d, hight = %d, value = %d", lowthreshold, highthreshold, value);
-          if ((lowthreshold) && (value < lowthreshold)) {
-            retval = -1;
-            notifications.test = "below";
-            notifications.threshold = lowthreshold;
-          } else if ((highthreshold) && (value >= highthreshold)) {
-            retval = 1;
-            notifications.test = "above"
-            notifications.threshold = highthreshold;
-          }
-          return(retval);
-        }).skipDuplicates().onValue(comparison => {
-          app.debug("comparison on %s yields %d", triggerpath, comparison);
-          var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.inrange);
-          if ((notification !== undefined) && (notification != notifications.lastNotification)) {
-            if (notification === null) {
-              app.debug("deleting notification on \'%s\'", notificationpath);
-            } else {
-              notification.message = notification.message
-              .replace(/\${path}/g, triggerpath)
-              .replace(/\${test}/g, notifications.test)
-              .replace(/\${threshold}/g, notifications.threshold)
-              .replace(/\${value}/g, notifications.value);
-              app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
-            }
-            notifications.lastNotification = notification;
-            delta.clear().addValue(notificationpath, notification).commit();
-          }
-        }));
-        return(a);
-      }, []);
+          unsubscribes = options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
+            var stream = app.streambundle.getSelfStream(triggerpath);
+            a.push(stream.map(value => {
+              var retval = 0;
+              notifications.value = value;
+              notifications.test = "between";
+              notifications.threshold = lowthreshold + " and " + highthreshold;
+              app.debug("lowt = %d, hight = %d, value = %d", lowthreshold, highthreshold, value);
+              if ((lowthreshold) && (value < lowthreshold)) {
+                retval = -1;
+                notifications.test = "below";
+                notifications.threshold = lowthreshold;
+              } else if ((highthreshold) && (value >= highthreshold)) {
+                retval = 1;
+                notifications.test = "above"
+                notifications.threshold = highthreshold;
+              }
+              return(retval);
+            }).skipDuplicates().onValue(comparison => {
+              app.debug("comparison on %s yields %d", triggerpath, comparison);
+              var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.inrange);
+              if ((notification !== undefined) && (notification != notifications.lastNotification)) {
+                if (notification === null) {
+                  app.debug("deleting notification on \'%s\'", notificationpath);
+                } else {
+                  notification.message = notification.message
+                  .replace(/\${path}/g, triggerpath)
+                  .replace(/\${test}/g, notifications.test)
+                  .replace(/\${threshold}/g, notifications.threshold)
+                  .replace(/\${value}/g, notifications.value);
+                  app.debug("issuing \'%s\' notification on \'%s\'", notification.state, notificationpath);
+                }
+                notifications.lastNotification = notification;
+                delta.clear().addValue(notificationpath, notification).commit();
+              }
+            }));
+            return(a);
+          }, []);
+        } else {
+          log.E("configuration includes no valid rules");
+        }
+      } else {
+        log.E("configuration includes no rules");
+      }
     } else {
-      log.N("stopped: missing, bad or empty configuration.");
+      log.E("configuration file missing or unusable");
     }
   }
 
