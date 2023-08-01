@@ -1,6 +1,6 @@
 {
   "name": "pdjr-skplugin-range-notifier",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Raise notifications based on value ranges",
   "main": "index.js",
   "signalk-plugin-enabled-by-default": true,
