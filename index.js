@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const MyApp = require('./lib/signalk-libapp/App.js');
-const Log = require('./lib/signalk-liblog/Log.js');
+const MyApp = require('signalk-libapp/App.js');
+const Log = require('signalk-liblog/Log.js');
 
 const PLUGIN_ID = "range-notifier";
 const PLUGIN_NAME = "pdjr-skplugin-range-notifier";

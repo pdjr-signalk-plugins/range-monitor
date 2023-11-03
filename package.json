@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/pdjr-signalk/pdjr-skplugin-range-notifier#readme",
   "dependencies": {
+    "signalk-libapp": "github:pdjr-signalk/signalk-libapp",
+    "signalk-liblog": "github:pdjr-signalk/signalk-liblog",
     "sprintf-js": "^1.1.2"
   },
   "directories": {
     "lib": "lib"
   }
 }
-
