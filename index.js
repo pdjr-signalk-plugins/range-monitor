@@ -30,31 +30,26 @@ const PLUGIN_SCHEMA = {
         "title": "Rule",
         "type": "object",
         "properties": {
-          "triggerpath": {
+          "triggerPath": {
             "title": "Monitored path",
             "type": "string"
           },
-          "lowthreshold": {
+          "lowThreshold": {
             "type": "number"
           },
-          "highthreshold": {
+          "highThreshold": {
             "type": "number"
           },
-          "notificationpath": {
+          "notificationPath": {
             "title": "Notification path",
             "type": "string"
           },
           "notifications" : {
             "type": "object",
             "properties": {
-              "inrange": {
+              "inRange": {
                 "type": "object",
                 "properties": {
-                  "message": {
-                    "title": "Notification message",
-                    "type": "string",
-                    "default": "${path} is nominal (${value})"
-                  },
                   "state": {
                     "title": "Alarm state",
                     "type": "string",
@@ -70,59 +65,73 @@ const PLUGIN_SCHEMA = {
                       "enum": [ "visual", "sound" ]
                     },
                     "uniqueItems": true
-                  }
-                }
-              },
-              "lowtransit": {
-                "type": "object",
-                "properties": {
+                  },
                   "message": {
                     "title": "Notification message",
                     "type": "string",
-                    "default": "${path} is ${test} ${threshold} (${value})"
-                  },
+                    "default": "${path} is nominal (${value})"
+                  }
+                },
+                "default": {
+                  "state": "normal",
+                  "method": [],
+                  "message": "${path} is nominal (${value})"
+                }
+              },
+              "lowTransit": {
+                "type": "object",
+                "properties": {
                   "state": {
                     "title": "Alarm state",
                     "type": "string",
-                    "default": "alert",
                     "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
                   },
                   "method": {
                     "title": "Suggested method",
                     "type": "array",
-                    "default": [],
                     "items": {
                       "type": "string",
                       "enum": [ "visual", "sound" ]
                     },
                     "uniqueItems": true
-                  }
-                }
-              },
-              "hightransit": {
-                "type": "object",
-                "properties": {
+                  },
                   "message": {
                     "title": "Notification message",
-                    "type": "string",
-                    "default": "${path} is ${test} ${threshold} (${value})"
-                  },
+                    "type": "string"
+                  }
+                },
+                "default": {
+                  "state": "alert",
+                  "method": [],
+                  "message": "${path} is ${test} ${threshold} (${value})"
+                }
+              },
+              "highTransit": {
+                "type": "object",
+                "properties": {
                   "state": {
                     "title": "Alarm state",
                     "type": "string",
-                    "default": "alert",
                     "enum": [ "normal", "alert", "warn", "alarm", "emergency" ]
                   },
                   "method": {
                     "title": "Suggested method",
                     "type": "array",
-                    "default": [],
                     "items": {
                       "type": "string",
                       "enum": [ "visual", "sound" ]
                     },
                     "uniqueItems": true
+                  },
+                  "message": {
+                    "title": "Notification message",
+                    "type": "string"
                   }
+                },
+                "default": {
+                  "state": "alert",
+                  "method": [],
+                  "message": "${path} is ${test} ${threshold} (${value})"
                 }
               }
             }
@@ -150,67 +159,68 @@ module.exports = function(app) {
 
   plugin.start = function(options) {
     plugin.options = {};
-    plugin.options.rules = (options.rules)?options.rules:plugin.schema.properties.rules.default;
+    plugin.options.rules = (options.rules || []).reduce((a,rule) => {
+      var validRule = {};
+      try {
+        if (rule.triggerPath) validRule.triggerPath = rule.triggerPath; else throw new Error("missing 'triggerPath' property");
+        if (rule.lowThreshold) validRule.lowThreshold = rule.lowThreshold; else throw new Error("missing 'lowThreshold' property");
+        if (rule.highThreshold) validRule.highThreshold = rule.highThreshold; else throw new Error("missing 'highThreshold' property");
+        validRule.notificationPath = (rule.notificationPath)?rule.notificationPath:`notifications.${rule.triggerPath}`;
+        validRule.notifications = {};
+        validRule.notifications.inRange = { ...plugin.schema.properties.rules.items.properties.notifications.properties.inRange.default, ...rule.notifications.inRange };
+        validRule.notifications.lowTransit = { ...plugin.schema.properties.rules.items.properties.notifications.properties.lowTransit.default, ...rule.notifications.lowTransit };
+        validRule.notifications.highTransit = { ...plugin.schema.properties.rules.items.properties.notifications.properties.highTransit.default, ...rule.notifications.highTransit };
+        a.push(validRule);
+      } catch(e) { log.W(`dropping `)}
+      return(a);
+    }, []);
 
-    if ((plugin.options.rules) && (Array.isArray(plugin.options.rules))) {
-      plugin.options.rules = plugin.options.rules.filter(rule => {
-        if ((rule.triggerpath) && (rule.lowthreshold) && (rule.highthreshold)) {
-          rule.notificationpath = (rule.notificationpath)?rule.notificationpath:(`notifications.${rule.triggerpath}`);
-          rule.notifications = (rule.notifications)?rule.notifications:{};
-          return(true);
-        } else {
-          log.W(`ignoring malformed rule (${JSON.stringify(rule)})`);
-          return(false);
-        }
-      });
+    app.debug(`using configuration: ${JSON.stringify(plugin.options, null, 2)}`);
         
-      if (plugin.options.rules.length > 0) {
-        log.N(`monitoring ${plugin.options.rules.length} trigger path${(plugin.options.rules.length == 1)?'':'s'}`);
-        plugin.options.rules.forEach(rule => { app.debug(`monitoring trigger path '${rule.triggerpath}'`); });
+    if (plugin.options.rules.length > 0) {
+      log.N(`monitoring ${plugin.options.rules.length} trigger path${(plugin.options.rules.length == 1)?'':'s'}`);
+      plugin.options.rules.forEach(rule => { app.debug(`monitoring trigger path '${rule.triggerPath}'`); });
 
-        unsubscribes = plugin.options.rules.reduce((a, { triggerpath, notificationpath, lowthreshold, highthreshold, notifications }) => {
-          var stream = app.streambundle.getSelfStream(triggerpath);
-          a.push(stream.map(value => {
-            var retval = 0;
-            notifications.value = value;
-            notifications.test = 'between';
-            notifications.threshold = `${lowthreshold} and ${highthreshold}`;
-            app.debug(`lowt = ${lowthreshold}, hight = ${highthreshold}, value = ${value}`);
-            if ((lowthreshold) && (value < lowthreshold)) {
-              retval = -1;
-              notifications.test = 'below';
-              notifications.threshold = lowthreshold;
-            } else if ((highthreshold) && (value >= highthreshold)) {
-              retval = 1;
-              notifications.test = 'above'
-              notifications.threshold = highthreshold;
+      unsubscribes = plugin.options.rules.reduce((a, { triggerPath, notificationPath, lowThreshold, highThreshold, notifications }) => {
+        var stream = app.streambundle.getSelfStream(triggerPath);
+        a.push(stream.map(value => {
+          var retval = 0;
+          notifications.value = value;
+          notifications.test = 'between';
+          notifications.threshold = `${lowThreshold} and ${highThreshold}`;
+          app.debug(`lowt = ${lowThreshold}, hight = ${highThreshold}, value = ${value}`);
+          if ((lowThreshold) && (value < lowThreshold)) {
+            retval = -1;
+            notifications.test = 'below';
+            notifications.threshold = lowThreshold;
+          } else if ((highThreshold) && (value >= highThreshold)) {
+            retval = 1;
+            notifications.test = 'above'
+            notifications.threshold = highThreshold;
+          }
+          return(retval);
+        }).skipDuplicates().onValue(comparison => {
+          app.debug(`comparison on ${triggerPath} yields ${comparison}`);
+          var notification = (comparison == 1)?notifications.highTransit:((comparison == -1)?notifications.lowTransit:notifications.inrange);
+          if ((notification !== undefined) && (notification != notifications.lastNotification)) {
+            if (notification === null) {
+              app.debug(`deleting notification on '${notificationPath}'`);
+            } else {
+              notification.message = notification.message
+              .replace(/\${path}/g, triggerPath)
+              .replace(/\${test}/g, notifications.test)
+              .replace(/\${threshold}/g, notifications.threshold)
+              .replace(/\${value}/g, notifications.value);
+              app.debug(`issuing '${notification.state}' notification on '${notificationPath}'`);
             }
-            return(retval);
-          }).skipDuplicates().onValue(comparison => {
-            app.debug(`comparison on ${triggerpath} yields ${comparison}`);
-            var notification = (comparison == 1)?notifications.hightransit:((comparison == -1)?notifications.lowtransit:notifications.inrange);
-            if ((notification !== undefined) && (notification != notifications.lastNotification)) {
-              if (notification === null) {
-                app.debug(`deleting notification on '${notificationpath}'`);
-              } else {
-                notification.message = notification.message
-                .replace(/\${path}/g, triggerpath)
-                .replace(/\${test}/g, notifications.test)
-                .replace(/\${threshold}/g, notifications.threshold)
-                .replace(/\${value}/g, notifications.value);
-                app.debug(`issuing '${notification.state}' notification on '${notificationpath}'`);
-              }
-              notifications.lastNotification = notification;
-              plugin.App.notify(notificationpath, notification, plugin.id);
-            }
-          }));
-          return(a);
-        }, []);
-      } else {
-        log.E("configuration includes no valid rules");
-      }
+            notifications.lastNotification = notification;
+            plugin.App.notify(notificationPath, notification, plugin.id);
+          }
+        }));
+        return(a);
+      }, []);
     } else {
-      log.E("configuration includes no rules");
+      log.E("configuration includes no valid rules");
     }
   }
 
