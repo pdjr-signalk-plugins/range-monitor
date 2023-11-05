@@ -138,23 +138,17 @@ module.exports = function(app) {
           return(retval);
         }).skipDuplicates((a,b) => (a.state == b.state)).onValue(({ state, description }) => {
           app.debug(`comparison on ${triggerPath} says ${description}`);
-          switch (state) {
-            case "cancel":
-              plugin.App.notify(notificationPath, null, plugin.id);
-              break;
-            default:
-              if (notificationStates[state] !== undefined) {
-                plugin.App.notify(
-                  notificationPath,
-                  {
-                    state: notificationStates[state],
-                    method: [],
-                    message: description
-                  },
-                  plugin.id
-                );
-              }
-              break;
+          if ((notificationStates[state] !== undefined) && (notificationStates[state] != notificationStates.lastState)) {
+            switch (notificationStates[state]) {
+              case "cancel":
+                plugin.App.notify(notificationPath, null, plugin.id);
+                notificationStates.lastState = "cancel";
+                break;
+              default:
+                plugin.App.notify(notificationPath, { state: notificationStates[state], method: [], message: description }, plugin.id);
+                notificationStates.lastState = notificationStates[state];
+                break;
+            }
           }
         }));
         return(a);
