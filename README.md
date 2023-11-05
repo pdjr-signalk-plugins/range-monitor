@@ -63,10 +63,10 @@ where each item is a *Rule* object.
     <em>path</em> makes transits through the defined thresholds.
     <p>
     Each property must hold one of the values 'cancel', 'normal',
-    'alert', 'warn', 'alarm' or 'emergency'.</p>.
+    'alert', 'warn', 'alarm' or 'emergency'.
     With the exception of 'cancel' which causes deletion of any
     pre-existing notification, values cause the issuing of a
-    notification with the specified state.
+    notification with the specified state.</p>
     <dl>
       <dt>State for notification issued when value enters range <code>inRange</code></dt>
       <dd>
