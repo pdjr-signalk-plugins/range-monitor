@@ -31,7 +31,7 @@ const PLUGIN_SCHEMA = {
         "type": "object",
         "properties": {
           "name": {
-            "title": "Name of rule",
+            "title": "Rule name",
             "type": "string"
           },
           "triggerPath": {
@@ -39,9 +39,11 @@ const PLUGIN_SCHEMA = {
             "type": "string"
           },
           "lowThreshold": {
+            "title": "Low threshold",
             "type": "number"
           },
           "highThreshold": {
+            "title": "High threshold",
             "type": "number"
           },
           "notificationPath": {
