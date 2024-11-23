@@ -8,10 +8,10 @@ Raise notifications based on value ranges.
 *rule*s.
 
 Each rule specifies a Signal K *path*, a pair of *threshold*s and some
-*notification*s.
+notification states.
 The *threshold*s define a range and the plugin will issue a
-*notification*, if one is defined, when the *path* value enters and
-leaves the specified range.
+notification when the *path* value enters and leaves the specified
+range.
 
 Differences between the various notification property values can be
 used to signal actions: perhaps the control of a discharge pump or the
@@ -19,58 +19,94 @@ monitoring of an engine or other sensor state.
 
 ## Configuration
 
-The plugin configuration file has a single property.
+The plugin configuration file contains a single *Rules* array property
+where each item is a *Rule* object.
 
-| Property            | Default | Description |
-| :------------------ | :------ | :-----------|
-| rules               | (none)  | Required array of *rule* objects. |
+<dl>
+  <dt>Rule name <code>name</code></dt>
+  <dd>
+    Optional string property giving a name for the rule.
+    Defaults to 'innominate'.
+  </dd>
+  <dt>Monitored path <code>triggerPath</code></dt>
+  <dd>
+    Required string property specifying the Signal K key whose value
+    should be monitored.
+  </dd>
+  <dt>Low threshold <code>lowThreshold</code></dt>
+  <dd>
+    Required number property defining the lower limit of this rule's
+    range.
+  </dd>
+  <dt>High threshold <code>highThreshold</code></dt>
+  <dd>
+    Required number property defining the upper limit of this rule's
+    range.
+  </dd>
+  <dt>Notification path <code>notificationPath</code></dt>
+  <dd>
+    Optional string property specifying the Signal K path to which
+    notifications will be written.
+    <p>
+    If omitted, then the value will be computed as
+    'notifications.<em>triggerPath</em>.<em>name</em>'.</p>
+    <p>
+    If the supplied value does not specify an absolute path in the
+    'notifications.' tree, then the value will be computed as above
+    except that <em>notificationPath</em> will be used instead of
+    <em>name</em>.</p>
+  <dd>
+  <dt>Notification states <code>notificationStates</code></dt>
+  <dd>
+    This object specifies up to three optional notification states
+    which will be applied to notifications as the value monitored on
+    <em>path</em> makes transits through the defined thresholds.
+    <p>
+    Each property must hold one of the values 'cancel', 'normal',
+    'alert', 'warn', 'alarm' or 'emergency'.
+    With the exception of 'cancel' which causes deletion of any
+    pre-existing notification, values cause the issuing of a
+    notification with the specified state.</p>
+    <dl>
+      <dt>State for notification issued when value enters range <code>inRange</code></dt>
+      <dd>
+        Optional.
+      </dd>
+      <dt>State for notification issued when value moves above <em>highThreshold</em> <code>highTransit</code></dt>
+      <dd>
+        Optional.
+      </dd>
+      <dt>State for notification issued when value moves below <em>lowThreshold</em> <code>lowTransit</code></dt>
+      <dd>
+        Optional.
+      </dd>
+      </dd>
+    </dl>
+  </dd>
+</dl>
 
-Each *rule* object has the following properties.
+### Configuration example
 
-| Property            | Default                     | Description |
-| :------------------ | :-------------------------- | :-----------|
-| triggerpath         | (none)                      | Required path which should be monitored. |
-| lowthreshold        | (none)                      | Required low threshold against which *triggerpath* value should be compared. |
-| highthreshold       | (none)                      | Required high threshold against which *triggerpath* value should be compared. |
-| notificationpath    | notifications.*triggerpath* | Optional path on which notifications should be issued when the *triggerpath* value transits a threshold. |
-| notifications       | {}                          | Optional definitions of the notifications to be raised under different comparison outcomes. |
-
-The *notifications* object has the following properties.
-
-| Property            | Default | Description |
-| :------------------ | :------ | :-----------|
-| inrange             | (none)  | Object defining the notification to be issued when *triggerpath* value enters the range between *lowthreshold* and *highthreshold*. |
-| hightransit         | (none)  | Object defining the notification to be issued when *triggerpath* value makes an
-excursion above *highthreshold*. |
-| lowtransit          | (none)  | Object defining the notification to be issued when *triggerpath* value makes an
-excursion below *lowthreshold*. |
-
-*nominal*, *hightransit* and *lowtransit* objects have the following properties.
-
-| Property            | Default  | Description |
-| :------------------ | :------- | :-----------|
-| message             | ""       | Notification message property value. |
-| state               | "normal" | Notification state property value. |
-| method              | []       | Notification method property value. |
-
-Any of the following tokens may be used in the supplied *message* text
-and will be interpolated with the described value when the notification
-message is composed.
-
-_${path}_ will be replaced by the value of *triggerpath*.
-
-_${test}_ will be replaced by one of "above", "below" or "between"
-dependant upon the threshold being crossed and the direction of
-crossing.
-
-_${threshold}_ will be replaced with the value of the threshold
-triggering the rule or, in the case of the path value being between
-thresholds with the string "_n_ and _m_" where _n_ is the low threshold
-and _m_ is the high threshold.
-
-_${value}_ will be replaced with the instantaneous value of the
-path that triggered the rule.
-
+Signal pump start when a tank reading reaches 80% and pump stop when
+tank reading falls below 5%.
+```
+{
+  "configuration": {
+    "rules": [
+      {
+        "name": "pumpOut",
+        "triggerPath": "tanks.wasteWater.0.currentLevel",
+        "highThreshold": 0.8,
+        "lowThreshold": 0.05,
+        "notificationStates": {
+          "highTransit": "alert",
+          "lowTransit": "cancel"
+        }
+      }
+    ]
+  }
+}
+``` 
 ## Operation
 
 The plugin must be configured before it can enter production.
