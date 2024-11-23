@@ -29,7 +29,6 @@
     "baconjs": "^3.0.19"
   },
   "devDependencies": {
-    "@types/node": "^22.5.4",
-    "@types/typescript": "^0.4.29"
+    "@types/node": "^22.5.4"
   }
 }
