@@ -78,7 +78,6 @@ module.exports = function(app: any) {
   var unsubscribes: any[] = []
   var pluginConfiguration: PluginConfiguration = {};
 
-
   const plugin: SKPlugin = {
 
     id: PLUGIN_ID,
@@ -92,10 +91,10 @@ module.exports = function(app: any) {
 
       try {
         pluginConfiguration = makePluginConfiguration(options);
-        app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`)
+        app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
         
         if ((pluginConfiguration.rules) && (pluginConfiguration.rules.length > 0)) {
-          app.setPluginStatus(`monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1)?'':'s'}`);
+          app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1)?'':'s'}`);
           pluginConfiguration.rules.forEach(rule  => { app.debug(`monitoring trigger path '${rule.triggerPath}'`); });
 
           unsubscribes = pluginConfiguration.rules.reduce((a: any, r: Rule) => {
@@ -162,7 +161,7 @@ module.exports = function(app: any) {
         inRangeNotificationState: (ruleOptions.inRangeNotificationState)?new NotificationState(ruleOptions.inRangeNotificationState):NotificationState.normal,
         lowTransitNotificationState: (ruleOptions.lowTransitNotificationState)?new NotificationState(ruleOptions.lowTransitNotificationState):NotificationState.alert,
         highTransitNotificationState: (ruleOptions.highTransitNotificationState)?new NotificationState(ruleOptions.highTransitNotificationState):NotificationState.alert,
-        lastNotificationState: NotificationState.normal
+        lastNotificationState: undefined
       };
       if (pluginConfiguration.rules) pluginConfiguration.rules.push(rule);
     });
@@ -214,7 +213,7 @@ interface Rule {
   inRangeNotificationState: NotificationState,
   lowTransitNotificationState: NotificationState,
   highTransitNotificationState: NotificationState,
-  lastNotificationState: NotificationState
+  lastNotificationState: NotificationState | undefined
 }
 
 interface TriggerMessage {
