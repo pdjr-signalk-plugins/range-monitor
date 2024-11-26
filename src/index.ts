@@ -51,44 +51,32 @@ const PLUGIN_SCHEMA: any = {
             "title": "Notification path",
             "type": "string"
           },
-          "notificationStates" : {
-            "type": "object",
-            "properties": {
-              "inRange": {
-                "title": "Notification state when in range",
-                "type": "string",
-                "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
-              },
-              "lowTransit": {
-                "title": "Notification state when below low threshold",
-                "type": "string",
-                "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
-              },
-              "highTransit": {
-                "title": "Notification state when above hight threshold",
-                  "type": "string",
-                  "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
-              },
-            }
+          "inRangeNotificationState": {
+            "title": "Notification state when in range",
+            "type": "string",
+            "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
+          },
+          "lowTransitNotificationState": {
+            "title": "Notification state when below low threshold",
+            "type": "string",
+            "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
+          },
+          "highTransitNotificationState": {
+            "title": "Notification state when above hight threshold",
+            "type": "string",
+            "enum": [ "cancel", "normal", "alert", "warn", "alarm", "emergency" ]
           }
         },
         "required": [ "triggerPath", "lowThreshold", "highThreshold" ],
-        "default": {
-          "name": "innominate",
-          "notificationStates": {}
-        }
-      },
+      }
     }
-  },
-  "default": {
-    "rules": []
   }
 };
 const PLUGIN_UISCHEMA: any = {};
 
 module.exports = function(app: any) {
   var unsubscribes: any[] = []
-  var rules: Rule[] = []
+  var pluginConfiguration: PluginConfiguration = {};
 
 
   const plugin: SKPlugin = {
@@ -99,69 +87,54 @@ module.exports = function(app: any) {
     schema: PLUGIN_SCHEMA,
     uiSchema: PLUGIN_UISCHEMA,
 
-    start: function(config: any) {
-      var delta: Delta = new Delta(app, plugin.id);
-      config = { ...plugin.schema.properties.default, ...config }
-      rules = config.rules.reduce((a: any, configRule: any) => {
-        var rule: Rule = {
-          name: configRule.name || undefined,
-          triggerPath: configRule.triggerPath || undefined,
-          lowThreshold: configRule.lowThreshold || undefined,
-          highThreshold: configRule.highThreshold || undefined,
-          notificationPath: configRule.notificationPath || undefined,
-          inRangeNotificationState: ((configRule.notificationStates) && (configRule.notificationStates.inRange))?new NotificationState(configRule.notificationStates.inRange):NotificationState.normal,
-          lowTransitNotificationState: ((configRule.notificationStates) && (configRule.notificationStates.lowTransit))?new NotificationState(configRule.notificationStates.lowTransit):NotificationState.alert,
-          highTransitNotificationState: ((configRule.notificationStates) && (configRule.notificationStates.highTransit))?new NotificationState(configRule.notificationStates.highTransit):NotificationState.alert
-        }
-        if ((!rule.name) || (!rule.triggerPath) || (!rule.lowThreshold) || (!rule.highThreshold)) {
-          app.debug(`ignoring malformed rule '${rule.name}`)
-        } else {
-          if (rule.notificationPath === undefined) rule.notificationPath = `notifications.${rule.triggerPath}.${rule.name}`
-          if (!rule.notificationPath.startsWith('notifications')) rule.notificationPath = `notifications.${rule.triggerPath}.${rule.notificationPath}`
-          a.push(rule)
-        }
-        return(a)
-      }, [])
+    start: function(options: any) {
+      var delta: Delta = new Delta(app, plugin.id); 
 
-      app.debug(`using configuration: ${JSON.stringify(rules, null, 2)}`)
+      try {
+        var pluginConfiguration = makePluginConfiguration(options);
+        app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`)
         
-      if (rules.length > 0) {
-        app.setPluginStatus(`monitoring ${rules.length} trigger path${(rules.length == 1)?'':'s'}`);
-        rules.forEach(rule => { app.debug(`monitoring trigger path '${rule.triggerPath}'`); });
+        if ((pluginConfiguration.rules) && (pluginConfiguration.rules.length > 0)) {
+          app.setPluginStatus(`monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1)?'':'s'}`);
+          pluginConfiguration.rules.forEach(rule  => { app.debug(`monitoring trigger path '${rule.triggerPath}'`); });
 
-        unsubscribes = rules.reduce((a: any, r: Rule) => {
-          var stream: EventStream<number> = app.streambundle.getSelfStream(r.triggerPath);
-          a.push(stream.map((value) => {
-            var retval: TriggerMessage;
-            var retval = { state: 'inRange', description: `Monitored value is between ${r.lowThreshold} and ${r.highThreshold}` };
-            app.debug(`low threshold = ${r.lowThreshold}, high threshold = ${r.highThreshold}, value = ${value}`);
-            if (value < r.lowThreshold) {
-              retval = { state: 'lowTransit', description: `Monitored value is below ${r.lowThreshold}` };
-            } else if (value >= r.highThreshold) {
-              retval = { state: 'highTransit', description: `Monitored value is above ${r.highThreshold}` };
-            }
-            return(retval);
-          }).skipDuplicates((a: TriggerMessage, b: TriggerMessage) => (a.state == b.state)).onValue((tm) => {
-            app.debug(`comparison on ${r.triggerPath} says '${tm.description}'`);
-            if ((getRuleNotificationState(r, tm.state) != getRuleNotificationState(r, 'last'))) {
-              switch (getRuleNotificationState(r, tm.state)) {
-                case 'cancel':
-                  delta.addValue(r.notificationPath, null).commit().clear();
-                  //app.notify(r.notificationPath, null, plugin.id);
-                  r.lastNotificationState = NotificationState.cancel;
-                  break;
-                default:
-                  delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
-                  //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
-                  r.lastNotificationState = new NotificationState(tm.state);
-                  break;
+          unsubscribes = pluginConfiguration.rules.reduce((a: any, r: Rule) => {
+            var stream: EventStream<number> = app.streambundle.getSelfStream(r.triggerPath);
+            a.push(stream.map((value) => {
+              var retval: TriggerMessage;
+              var retval = { state: 'inRange', description: `Monitored value is between ${r.lowThreshold} and ${r.highThreshold}` };
+              app.debug(`low threshold = ${r.lowThreshold}, high threshold = ${r.highThreshold}, value = ${value}`);
+              if (value < r.lowThreshold) {
+                retval = { state: 'lowTransit', description: `Monitored value is below ${r.lowThreshold}` };
+              } else if (value >= r.highThreshold) {
+                retval = { state: 'highTransit', description: `Monitored value is above ${r.highThreshold}` };
               }
-            }
-          }));
-          return(a);
-        }, []);
-      } else {
-        app.setPluginStatus('Stopped: configuration includes no valid rules');
+              return(retval);
+            }).skipDuplicates((a: TriggerMessage, b: TriggerMessage) => (a.state == b.state)).onValue((tm) => {
+              app.debug(`comparison on ${r.triggerPath} says '${tm.description}'`);
+              if ((getRuleNotificationState(r, tm.state) != getRuleNotificationState(r, 'last'))) {
+                switch (getRuleNotificationState(r, tm.state)) {
+                  case 'cancel':
+                    delta.addValue(r.notificationPath, null).commit().clear();
+                    //app.notify(r.notificationPath, null, plugin.id);
+                    r.lastNotificationState = NotificationState.cancel;
+                    break;
+                  default:
+                    delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
+                    //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
+                    r.lastNotificationState = new NotificationState(tm.state);
+                    break;
+                }
+              }
+            }));
+            return(a);
+          }, []);
+        } else {
+          app.setPluginStatus('Stopped: configuration includes no valid rules');
+        }
+      } catch(e: any) {
+        app.setPluginStatus('Stopped: plugin configuration error');
+        app.setPluginError(e.messge);
       }
     },
 
@@ -171,6 +144,30 @@ module.exports = function(app: any) {
     }
 
   } // End of plugin
+
+  function makePluginConfiguration(options: any): PluginConfiguration {
+    var pluginConfiguration: PluginConfiguration = { rules: [] };
+
+    options.rule.forEach((ruleOptions: any) => {
+      if (!ruleOptions.triggerPath) throw new Error('missing \'triggerPath\' property');
+      if (!ruleOptions.lowThreshold) throw new Error('missing \'lowThreshold\' property');
+      if (!ruleOptions.highThreshold) throw new Error('missing \'highThreshold\' property');
+
+      var rule: Rule = {
+        name: ruleOptions.name || 'Innominate rule',
+        triggerPath: ruleOptions.triggerPath,
+        notificationPath: ruleOptions.notificationPath || `notifications.${ruleOptions.triggerPath}`,
+        lowThreshold: ruleOptions.lowThreshold,
+        highThreshold: ruleOptions.highThreshold,
+        inRangeNotificationState: (ruleOptions.inRangeNotificationState)?new NotificationState(ruleOptions.inRangeNotificationState):NotificationState.normal,
+        lowTransitNotificationState: (ruleOptions.lowTransitNotificationState)?new NotificationState(ruleOptions.lowTransitNotificationState):NotificationState.alert,
+        highTransitNotificationState: (ruleOptions.highTransitNotificationState)?new NotificationState(ruleOptions.highTransitNotificationState):NotificationState.alert,
+        lastNotificationState: NotificationState.normal
+      };
+      if (pluginConfiguration.rules) pluginConfiguration.rules.push(rule);
+    });
+    return(pluginConfiguration);
+  }
 
   function getRuleNotificationState(rule: Rule, state: string) {
     switch (state) {
@@ -204,6 +201,9 @@ interface SKPlugin {
   stop: () => void
 }
 
+interface PluginConfiguration {
+  rules?: Rule[]
+}
 
 interface Rule {
   name: string,
@@ -214,7 +214,7 @@ interface Rule {
   inRangeNotificationState: NotificationState,
   lowTransitNotificationState: NotificationState,
   highTransitNotificationState: NotificationState,
-  lastNotificationState?: NotificationState
+  lastNotificationState: NotificationState
 }
 
 interface TriggerMessage {
