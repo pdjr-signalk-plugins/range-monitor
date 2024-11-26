@@ -30,6 +30,7 @@
     "signalk-libdelta": "github:pdjr-signalk/signalk-libdelta"
   },
   "devDependencies": {
-    "@types/node": "^22.5.4"
+    "@types/node": "^22.5.4",
+    "typescript": "^5.7.2"
   }
 }
