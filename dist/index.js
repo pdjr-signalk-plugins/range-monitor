@@ -16,6 +16,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const NotificationState_1 = require("./NotificationState");
+const signalk_libdelta_1 = require("signalk-libdelta");
 const PLUGIN_ID = 'range-notifier';
 const PLUGIN_NAME = 'pdjr-skplugin-range-notifier';
 const PLUGIN_DESCRIPTION = 'Raise notifications based on value ranges.';
@@ -93,6 +94,7 @@ module.exports = function (app) {
         schema: PLUGIN_SCHEMA,
         uiSchema: PLUGIN_UISCHEMA,
         start: function (config) {
+            var delta = new signalk_libdelta_1.Delta(app, plugin.id);
             config = { ...plugin.schema.properties.default, ...config };
             rules = config.rules.reduce((a, configRule) => {
                 var rule = {
@@ -139,11 +141,13 @@ module.exports = function (app) {
                         if ((getRuleNotificationState(r, tm.state) != getRuleNotificationState(r, 'last'))) {
                             switch (getRuleNotificationState(r, tm.state)) {
                                 case 'cancel':
-                                    app.notify(r.notificationPath, null, plugin.id);
+                                    delta.addValue(r.notificationPath, null).commit().clear();
+                                    //app.notify(r.notificationPath, null, plugin.id);
                                     r.lastNotificationState = NotificationState_1.NotificationState.cancel;
                                     break;
                                 default:
-                                    app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
+                                    delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
+                                    //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
                                     r.lastNotificationState = new NotificationState_1.NotificationState(tm.state);
                                     break;
                             }

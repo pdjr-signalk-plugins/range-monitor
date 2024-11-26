@@ -16,6 +16,7 @@
 
 import { EventStream } from 'baconjs'
 import { NotificationState } from "./NotificationState"
+import { Delta } from "signalk-libdelta"
 
 const PLUGIN_ID: string = 'range-notifier'
 const PLUGIN_NAME: string = 'pdjr-skplugin-range-notifier'
@@ -89,6 +90,7 @@ module.exports = function(app: any) {
   var unsubscribes: any[] = []
   var rules: Rule[] = []
 
+
   const plugin: SKPlugin = {
 
     id: PLUGIN_ID,
@@ -98,6 +100,7 @@ module.exports = function(app: any) {
     uiSchema: PLUGIN_UISCHEMA,
 
     start: function(config: any) {
+      var delta: Delta = new Delta(app, plugin.id);
       config = { ...plugin.schema.properties.default, ...config }
       rules = config.rules.reduce((a: any, configRule: any) => {
         var rule: Rule = {
@@ -143,11 +146,13 @@ module.exports = function(app: any) {
             if ((getRuleNotificationState(r, tm.state) != getRuleNotificationState(r, 'last'))) {
               switch (getRuleNotificationState(r, tm.state)) {
                 case 'cancel':
-                  app.notify(r.notificationPath, null, plugin.id);
+                  delta.addValue(r.notificationPath, null).commit().clear();
+                  //app.notify(r.notificationPath, null, plugin.id);
                   r.lastNotificationState = NotificationState.cancel;
                   break;
                 default:
-                  app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
+                  delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
+                  //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
                   r.lastNotificationState = new NotificationState(tm.state);
                   break;
               }
