@@ -137,9 +137,8 @@ module.exports = function (app) {
         }
     }; // End of plugin
     function makePluginConfiguration(options) {
-        app.debug(`makePluginConfiguration(${JSON.stringify(options)})`);
         var pluginConfiguration = { rules: [] };
-        options.rule.forEach((ruleOptions) => {
+        options.rules.forEach((ruleOptions) => {
             if (!ruleOptions.triggerPath)
                 throw new Error('missing \'triggerPath\' property');
             if (!ruleOptions.lowThreshold)

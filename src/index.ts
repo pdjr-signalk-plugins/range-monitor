@@ -145,10 +145,9 @@ module.exports = function(app: any) {
   } // End of plugin
 
   function makePluginConfiguration(options: any): PluginConfiguration {
-    app.debug(`makePluginConfiguration(${JSON.stringify(options)})`);
     var pluginConfiguration: PluginConfiguration = { rules: [] };
 
-    options.rule.forEach((ruleOptions: any) => {
+    options.rules.forEach((ruleOptions: any) => {
       if (!ruleOptions.triggerPath) throw new Error('missing \'triggerPath\' property');
       if (!ruleOptions.lowThreshold) throw new Error('missing \'lowThreshold\' property');
       if (!ruleOptions.highThreshold) throw new Error('missing \'highThreshold\' property');
