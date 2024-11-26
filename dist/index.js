@@ -87,7 +87,7 @@ module.exports = function (app) {
                 pluginConfiguration = makePluginConfiguration(options);
                 app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
                 if ((pluginConfiguration.rules) && (pluginConfiguration.rules.length > 0)) {
-                    app.setPluginStatus(`monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
+                    app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
                     pluginConfiguration.rules.forEach(rule => { app.debug(`monitoring trigger path '${rule.triggerPath}'`); });
                     unsubscribes = pluginConfiguration.rules.reduce((a, r) => {
                         var stream = app.streambundle.getSelfStream(r.triggerPath);
@@ -137,6 +137,7 @@ module.exports = function (app) {
         }
     }; // End of plugin
     function makePluginConfiguration(options) {
+        app.debug(`makePluginConfiguration(${JSON.stringify(options)})`);
         var pluginConfiguration = { rules: [] };
         options.rule.forEach((ruleOptions) => {
             if (!ruleOptions.triggerPath)
@@ -154,7 +155,7 @@ module.exports = function (app) {
                 inRangeNotificationState: (ruleOptions.inRangeNotificationState) ? new NotificationState_1.NotificationState(ruleOptions.inRangeNotificationState) : NotificationState_1.NotificationState.normal,
                 lowTransitNotificationState: (ruleOptions.lowTransitNotificationState) ? new NotificationState_1.NotificationState(ruleOptions.lowTransitNotificationState) : NotificationState_1.NotificationState.alert,
                 highTransitNotificationState: (ruleOptions.highTransitNotificationState) ? new NotificationState_1.NotificationState(ruleOptions.highTransitNotificationState) : NotificationState_1.NotificationState.alert,
-                lastNotificationState: NotificationState_1.NotificationState.normal
+                lastNotificationState: undefined
             };
             if (pluginConfiguration.rules)
                 pluginConfiguration.rules.push(rule);

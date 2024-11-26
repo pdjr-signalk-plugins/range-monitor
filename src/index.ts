@@ -145,6 +145,7 @@ module.exports = function(app: any) {
   } // End of plugin
 
   function makePluginConfiguration(options: any): PluginConfiguration {
+    app.debug(`makePluginConfiguration(${JSON.stringify(options)})`);
     var pluginConfiguration: PluginConfiguration = { rules: [] };
 
     options.rule.forEach((ruleOptions: any) => {
