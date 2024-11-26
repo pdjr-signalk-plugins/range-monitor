@@ -9,9 +9,9 @@ Raise notifications based on value ranges.
 
 Each rule specifies a Signal K *path*, a pair of *threshold*s and some
 notification states.
-The *threshold*s define a range and the plugin will issue a
-notification when the *path* value enters and leaves the specified
-range.
+The *threshold*s define the upper and lower limits of a value range and
+the plugin will issue a notification when the *path* value enters and
+leaves this defined range.
 
 Differences between the various notification property values can be
 used to signal actions: perhaps the control of a discharge pump or the
@@ -25,63 +25,59 @@ where each item is a *Rule* object.
 <dl>
   <dt>Rule name <code>name</code></dt>
   <dd>
+    <p>
     Optional string property giving a name for the rule.
-    Defaults to 'innominate'.
+    </p><p>
+    Defaults to 'Innominate rule'.
+    </p>
   </dd>
-  <dt>Monitored path <code>triggerPath</code></dt>
+  <dt>Trigger path <code>triggerPath</code></dt>
   <dd>
+    <p>
     Required string property specifying the Signal K key whose value
     should be monitored.
+    </p>
   </dd>
   <dt>Low threshold <code>lowThreshold</code></dt>
   <dd>
-    Required number property defining the lower limit of this rule's
-    range.
+    <p>
+    Required number property defining the lower threshold of this
+    rule's monitoring range.
+    </p>
   </dd>
   <dt>High threshold <code>highThreshold</code></dt>
   <dd>
-    Required number property defining the upper limit of this rule's
-    range.
+    <p>
+    Required number property defining the upper threshold of this
+    rule's monitoring range.
   </dd>
   <dt>Notification path <code>notificationPath</code></dt>
   <dd>
-    Optional string property specifying the Signal K path to which
-    notifications will be written.
     <p>
-    If omitted, then the value will be computed as
-    'notifications.<em>triggerPath</em>.<em>name</em>'.</p>
-    <p>
-    If the supplied value does not specify an absolute path in the
-    'notifications.' tree, then the value will be computed as above
-    except that <em>notificationPath</em> will be used instead of
-    <em>name</em>.</p>
+    Optional string property which can be used to override the
+    default Signal K path to which notifications will be written.
+    </p><p>
+    If no value is supplied then notifications will be written to
+    the default path ```notifications.<em>triggerPath</em>```.</p>
+    </p><p>
+    If a value is supplied and it does not specify an absolute path
+    in the 'notifications.' tree, then notifications will be wriiten
+    to ```notifications.<em>triggerPath</em>.<em>notificationPath</em>```.
+    </p><p>
+    Otherwise notifications will be written to ```<em>notificationPath</em>```.
+    </p>
   <dd>
-  <dt>Notification states <code>notificationStates</code></dt>
+  <dt>State for notification issued when value enters range <code>inRangeNotificationState</code></dt>
   <dd>
-    This object specifies up to three optional notification states
-    which will be applied to notifications as the value monitored on
-    <em>path</em> makes transits through the defined thresholds.
-    <p>
-    Each property must hold one of the values 'cancel', 'normal',
-    'alert', 'warn', 'alarm' or 'emergency'.
-    With the exception of 'cancel' which causes deletion of any
-    pre-existing notification, values cause the issuing of a
-    notification with the specified state.</p>
-    <dl>
-      <dt>State for notification issued when value enters range <code>inRange</code></dt>
-      <dd>
-        Optional.
-      </dd>
-      <dt>State for notification issued when value moves above <em>highThreshold</em> <code>highTransit</code></dt>
-      <dd>
-        Optional.
-      </dd>
-      <dt>State for notification issued when value moves below <em>lowThreshold</em> <code>lowTransit</code></dt>
-      <dd>
-        Optional.
-      </dd>
-      </dd>
-    </dl>
+    Optional.
+  </dd>
+  <dt>State for notification issued when value moves above <em>highThreshold</em> <code>highTransit</code></dt>
+  <dd>
+    Optional.
+  </dd>
+  <dt>State for notification issued when value moves below <em>lowThreshold</em> <code>lowTransit</code></dt>
+  <dd>
+    Optional.
   </dd>
 </dl>
 
