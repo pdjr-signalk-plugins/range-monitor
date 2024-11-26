@@ -91,8 +91,7 @@ module.exports = function(app: any) {
       var delta: Delta = new Delta(app, plugin.id); 
 
       try {
-        app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`)
-        var pluginConfiguration = makePluginConfiguration(options);
+        pluginConfiguration = makePluginConfiguration(options);
         app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`)
         
         if ((pluginConfiguration.rules) && (pluginConfiguration.rules.length > 0)) {

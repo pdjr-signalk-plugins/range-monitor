@@ -84,8 +84,7 @@ module.exports = function (app) {
         start: function (options) {
             var delta = new signalk_libdelta_1.Delta(app, plugin.id);
             try {
-                app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
-                var pluginConfiguration = makePluginConfiguration(options);
+                pluginConfiguration = makePluginConfiguration(options);
                 app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
                 if ((pluginConfiguration.rules) && (pluginConfiguration.rules.length > 0)) {
                     app.setPluginStatus(`monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
