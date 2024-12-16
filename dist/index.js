@@ -111,6 +111,8 @@ module.exports = function (app) {
                                         //app.notify(r.notificationPath, null, plugin.id);
                                         r.lastNotificationState = NotificationState_1.NotificationState.cancel;
                                         break;
+                                    case undefined:
+                                        break;
                                     default:
                                         delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
                                         //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
@@ -176,7 +178,7 @@ module.exports = function (app) {
                 return ((rule.lastNotificationState) ? rule.lastNotificationState.getName() : '');
                 break;
             default:
-                throw Error(`invalid notification state '${state}'`);
+                return (undefined);
         }
     }
     return (plugin);
