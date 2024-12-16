@@ -8,6 +8,7 @@ export class NotificationState {
   static warn = new NotificationState('warn')
   static alarm = new NotificationState('alarm')
   static emergency = new NotificationState('emergency')
+  static undefined = new NotificationState('undefined')
 
   constructor(name: string) {
     this.name = name

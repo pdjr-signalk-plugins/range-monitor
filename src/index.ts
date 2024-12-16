@@ -118,7 +118,7 @@ module.exports = function(app: any) {
                     //app.notify(r.notificationPath, null, plugin.id);
                     r.lastNotificationState = NotificationState.cancel;
                     break;
-                  case undefined:
+                  case 'undefined':
                     break;
                   default:
                     delta.addValue(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }).commit().clear();
@@ -160,9 +160,9 @@ module.exports = function(app: any) {
         notificationPath: ruleOptions.notificationPath || `notifications.${ruleOptions.triggerPath}`,
         lowThreshold: ruleOptions.lowThreshold,
         highThreshold: ruleOptions.highThreshold,
-        inRangeNotificationState: (ruleOptions.inRangeNotificationState)?new NotificationState(ruleOptions.inRangeNotificationState):NotificationState.normal,
-        lowTransitNotificationState: (ruleOptions.lowTransitNotificationState)?new NotificationState(ruleOptions.lowTransitNotificationState):NotificationState.alert,
-        highTransitNotificationState: (ruleOptions.highTransitNotificationState)?new NotificationState(ruleOptions.highTransitNotificationState):NotificationState.alert,
+        inRangeNotificationState: (ruleOptions.inRangeNotificationState)?new NotificationState(ruleOptions.inRangeNotificationState):NotificationState.undefined,
+        lowTransitNotificationState: (ruleOptions.lowTransitNotificationState)?new NotificationState(ruleOptions.lowTransitNotificationState):NotificationState.undefined,
+        highTransitNotificationState: (ruleOptions.highTransitNotificationState)?new NotificationState(ruleOptions.highTransitNotificationState):NotificationState.undefined,
         lastNotificationState: undefined
       };
       if (pluginConfiguration.rules) pluginConfiguration.rules.push(rule);
@@ -170,7 +170,9 @@ module.exports = function(app: any) {
     return(pluginConfiguration);
   }
 
-  function getRuleNotificationState(rule: Rule, state: string): string | undefined {
+  function getRuleNotificationState(rule: Rule, state: string): string {
+    var retval: string;
+
     switch (state) {
       case 'inRange':
         return(rule.inRangeNotificationState.getName());
@@ -185,7 +187,8 @@ module.exports = function(app: any) {
         return((rule.lastNotificationState)?rule.lastNotificationState.getName():'');
         break;
       default:
-        return(undefined);
+        throw new Error(`unknown state`);
+        break;
     }
   }
 

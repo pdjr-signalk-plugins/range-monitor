@@ -6,6 +6,7 @@ export declare class NotificationState {
     static warn: NotificationState;
     static alarm: NotificationState;
     static emergency: NotificationState;
+    static undefined: NotificationState;
     constructor(name: string);
     getName(): string;
 }

@@ -16,3 +16,4 @@ NotificationState.alert = new NotificationState('alert');
 NotificationState.warn = new NotificationState('warn');
 NotificationState.alarm = new NotificationState('alarm');
 NotificationState.emergency = new NotificationState('emergency');
+NotificationState.undefined = new NotificationState('undefined');
