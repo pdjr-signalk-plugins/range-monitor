@@ -28,7 +28,7 @@ where each item is a *Rule* object.
     <p>
     Optional string property giving a name for the rule.
     </p><p>
-    Defaults to 'Innominate rule'.
+    Defaults to 'innominate'.
     </p>
   </dd>
   <dt>Trigger path <code>triggerPath</code></dt>
@@ -58,7 +58,7 @@ where each item is a *Rule* object.
     default Signal K path to which notifications will be written.
     </p><p>
     If no value is supplied then notifications will be written to
-    the default path ```notifications.<em>triggerPath</em>```.</p>
+    the path ```notifications.<em>triggerPath</em>```.</p>
     </p><p>
     If a value is supplied and it does not specify an absolute path
     in the 'notifications.' tree, then notifications will be wriiten
