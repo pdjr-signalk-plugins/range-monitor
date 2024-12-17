@@ -103,7 +103,7 @@ module.exports = function(app: any) {
             app.streambundle.getSelfStream(rule.triggerPath)
             .map((value: number) => value2ValueClass(value, rule))
             .skipDuplicates()
-            .map((valueclass: ValueClass) => rule.getNotificationState(valueclass))
+            .map((valueclass: ValueClass) => { app.debug(`rule '${rule.name}' handling value class '${valueclass.getName()}'`); return(rule.getNotificationState(valueclass)); })
             .onValue((notificationState: NotificationState) => {
               if (notificationState != rule.lastNotificationState) {
                 switch (notificationState) {
