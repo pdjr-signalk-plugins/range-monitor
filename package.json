@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/pdjr-signalk/pdjr-skplugin-range-notifier#readme",
   "dependencies": {
-    "baconjs": "^3.0.19",
     "signalk-libdelta": "github:pdjr-signalk/signalk-libdelta"
   },
   "devDependencies": {
