@@ -95,20 +95,20 @@ module.exports = function (app) {
                         .skipDuplicates()
                         .map((value) => { app.debug(`rule '${rule.name}' received value ${value}`); return (value2ValueClass(value, rule)); })
                         .skipDuplicates()
-                        .map((valueclass) => { app.debug(`rule '${rule.name}' handling value class '${valueclass.getName()}'`); return (rule.getNotificationState(valueclass)); })
+                        .map((valueclass) => { app.debug(`rule '${rule.name}' value classified as '${valueclass.getName()}'`); return (rule.getNotificationState(valueclass)); })
                         .onValue((notificationState) => {
                         if (notificationState != rule.lastNotificationState) {
                             switch (notificationState) {
                                 case NotificationState_1.NotificationState.cancel:
                                     delta.addValue(rule.notificationPath, null).commit().clear();
-                                    //app.notify(r.notificationPath, null, plugin.id);
+                                    app.debug(`rule '${rule.name}' cancelling notification on '${rule.notificationPath}'`);
                                     rule.lastNotificationState = notificationState;
                                     break;
                                 case NotificationState_1.NotificationState.undefined:
                                     break;
                                 default:
                                     delta.addValue(rule.notificationPath, { state: notificationState, method: [], message: '' }).commit().clear();
-                                    //app.notify(r.notificationPath, { state: getRuleNotificationState(r, tm.state), method: [], message: tm.description }, plugin.id);
+                                    app.debug(`rule '${rule.name}' issuing '${notificationState}' notification on '${rule.notificationPath}'`);
                                     rule.lastNotificationState = notificationState;
                                     break;
                             }

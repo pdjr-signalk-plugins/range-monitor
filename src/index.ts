@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { NotificationState } from './NotificationState'
-import { Rule } from './Rule' 
-import { ValueClass } from './ValueClass'
-import { Delta } from "signalk-libdelta"
+import { NotificationState } from './NotificationState';
+import { Rule } from './Rule';
+import { ValueClass } from './ValueClass';
+import { Delta } from 'signalk-libdelta';
 
 const PLUGIN_ID: string = 'range-notifier'
 const PLUGIN_NAME: string = 'pdjr-skplugin-range-notifier'
