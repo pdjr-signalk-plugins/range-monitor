@@ -115,8 +115,8 @@ module.exports = function(app: any) {
                   case NotificationState.undefined:
                     break;
                   default:
-                    delta.addValue(rule.notificationPath, { state: notificationState, method: [], message: '' }).commit().clear();
-                    app.debug(`rule '${rule.name}' issuing '${notificationState}' notification on '${rule.notificationPath}'`);                    
+                    delta.addValue(rule.notificationPath, { state: notificationState.getName(), method: [], message: '' }).commit().clear();
+                    app.debug(`rule '${rule.name}' issuing '${notificationState.getName()}' notification on '${rule.notificationPath}'`);                    
                     rule.lastNotificationState = notificationState;
                     break;
                 }
