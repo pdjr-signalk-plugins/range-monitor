@@ -151,7 +151,7 @@ module.exports = function(app: any) {
 
     if (!options.rules) throw new Error('missing \'rules\' property');
     
-    pluginConfiguration.rules = options.rules.reduce((rules: Rule[], option: any) => rules.push(new Rule(option)), []);
+    pluginConfiguration.rules = options.rules.map((option: any) => new Rule(option));
 
     return(pluginConfiguration);
   }
