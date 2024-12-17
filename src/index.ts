@@ -97,7 +97,7 @@ module.exports = function(app: any) {
         
         if (pluginConfiguration.rules.length > 0) {
           app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1)?'':'s'}`);
-          pluginConfiguration.rules.forEach(rule  => { app.debug(`${rule.name} is monitoring trigger path '${rule.triggerPath}'`); });
+          pluginConfiguration.rules.forEach(rule  => { app.debug(`applying rule '${rule.name}' to trigger path '${rule.triggerPath}'`); });
 
           unsubscribes = pluginConfiguration.rules.map((rule) => (
             app.streambundle.getSelfStream(rule.triggerPath)
