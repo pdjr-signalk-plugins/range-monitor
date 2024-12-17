@@ -106,13 +106,13 @@ module.exports = function(app: any) {
             .map((valueclass: ValueClass) => { app.debug(`rule '${rule.name}' value classified as '${valueclass.getName()}'`); return(rule.getNotificationState(valueclass)); })
             .onValue((notificationState: NotificationState) => {
               if (notificationState != rule.lastNotificationState) {
-                switch (notificationState) {
-                  case NotificationState.cancel:
+                switch (notificationState.getName()) {
+                  case 'cancel':
                     delta.addValue(rule.notificationPath, null).commit().clear();
                     app.debug(`rule '${rule.name}' cancelling notification on '${rule.notificationPath}'`);
                     rule.lastNotificationState = notificationState;
                     break;
-                  case NotificationState.undefined:
+                  case 'undefined':
                     break;
                   default:
                     delta.addValue(rule.notificationPath, { state: notificationState.getName(), method: [], message: '' }).commit().clear();

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const NotificationState_1 = require("./NotificationState");
 const Rule_1 = require("./Rule");
 const ValueClass_1 = require("./ValueClass");
 const signalk_libdelta_1 = require("signalk-libdelta");
@@ -98,13 +97,13 @@ module.exports = function (app) {
                         .map((valueclass) => { app.debug(`rule '${rule.name}' value classified as '${valueclass.getName()}'`); return (rule.getNotificationState(valueclass)); })
                         .onValue((notificationState) => {
                         if (notificationState != rule.lastNotificationState) {
-                            switch (notificationState) {
-                                case NotificationState_1.NotificationState.cancel:
+                            switch (notificationState.getName()) {
+                                case 'cancel':
                                     delta.addValue(rule.notificationPath, null).commit().clear();
                                     app.debug(`rule '${rule.name}' cancelling notification on '${rule.notificationPath}'`);
                                     rule.lastNotificationState = notificationState;
                                     break;
-                                case NotificationState_1.NotificationState.undefined:
+                                case 'undefined':
                                     break;
                                 default:
                                     delta.addValue(rule.notificationPath, { state: notificationState.getName(), method: [], message: '' }).commit().clear();

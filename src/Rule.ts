@@ -35,7 +35,6 @@ export class Rule {
       case ValueClass.inrange: return(this.inRangeNotificationState);
       case ValueClass.low: return(this.lowTransitNotificationState);
       case ValueClass.high: return(this.highTransitNotificationState);
-      case ValueClass.last: return(this.lastNotificationState);
     }
     return(NotificationState.undefined);
   }

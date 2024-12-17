@@ -35,7 +35,6 @@ class Rule {
             case ValueClass_1.ValueClass.inrange: return (this.inRangeNotificationState);
             case ValueClass_1.ValueClass.low: return (this.lowTransitNotificationState);
             case ValueClass_1.ValueClass.high: return (this.highTransitNotificationState);
-            case ValueClass_1.ValueClass.last: return (this.lastNotificationState);
         }
         return (NotificationState_1.NotificationState.undefined);
     }
