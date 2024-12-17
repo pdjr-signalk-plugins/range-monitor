@@ -92,7 +92,8 @@ module.exports = function (app) {
                     app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
                     pluginConfiguration.rules.forEach(rule => { app.debug(`applying rule '${rule.name}' to trigger path '${rule.triggerPath}'`); });
                     unsubscribes = pluginConfiguration.rules.map((rule) => (app.streambundle.getSelfStream(rule.triggerPath)
-                        .map((value) => value2ValueClass(value, rule))
+                        .skipDuplicates()
+                        .map((value) => { app.debug(`rule '${rule.name}' received value ${value}`); return (value2ValueClass(value, rule)); })
                         .skipDuplicates()
                         .map((valueclass) => { app.debug(`rule '${rule.name}' handling value class '${valueclass.getName()}'`); return (rule.getNotificationState(valueclass)); })
                         .onValue((notificationState) => {

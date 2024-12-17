@@ -101,7 +101,8 @@ module.exports = function(app: any) {
 
           unsubscribes = pluginConfiguration.rules.map((rule) => (
             app.streambundle.getSelfStream(rule.triggerPath)
-            .map((value: number) => value2ValueClass(value, rule))
+            .skipDuplicates()
+            .map((value: number) => { app.debug(`rule '${rule.name}' received value ${value}`); return(value2ValueClass(value, rule)); })
             .skipDuplicates()
             .map((valueclass: ValueClass) => { app.debug(`rule '${rule.name}' handling value class '${valueclass.getName()}'`); return(rule.getNotificationState(valueclass)); })
             .onValue((notificationState: NotificationState) => {
