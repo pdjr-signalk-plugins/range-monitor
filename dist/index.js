@@ -77,7 +77,7 @@ const PLUGIN_UISCHEMA = {};
 module.exports = function (app) {
     var unsubscribes = [];
     var pluginConfiguration = {};
-    var pluginStatus = new signalk_libpluginstatus_1.PluginStatus(app, '');
+    var pluginStatus;
     const plugin = {
         id: PLUGIN_ID,
         name: PLUGIN_NAME,
@@ -86,6 +86,7 @@ module.exports = function (app) {
         uiSchema: PLUGIN_UISCHEMA,
         start: function (options) {
             var delta = new signalk_libdelta_1.Delta(app, plugin.id);
+            pluginStatus = new signalk_libpluginstatus_1.PluginStatus(app, 'started');
             try {
                 pluginConfiguration = makePluginConfiguration(options);
                 app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);

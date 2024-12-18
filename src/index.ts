@@ -79,7 +79,7 @@ const PLUGIN_UISCHEMA: any = {};
 module.exports = function(app: any) {
   var unsubscribes: (() => void)[] = [];
   var pluginConfiguration: PluginConfiguration = <PluginConfiguration>{};
-  var pluginStatus: PluginStatus = new PluginStatus(app, '');
+  var pluginStatus: PluginStatus;
 
   const plugin: SKPlugin = {
 
@@ -90,7 +90,8 @@ module.exports = function(app: any) {
     uiSchema: PLUGIN_UISCHEMA,
 
     start: function(options: any) {
-      var delta: Delta = new Delta(app, plugin.id); 
+      var delta: Delta = new Delta(app, plugin.id);
+      pluginStatus = new PluginStatus(app, 'started');
 
       try {
         pluginConfiguration = makePluginConfiguration(options);
