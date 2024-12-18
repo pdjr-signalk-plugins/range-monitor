@@ -18,6 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Rule_1 = require("./Rule");
 const ValueClass_1 = require("./ValueClass");
 const signalk_libdelta_1 = require("signalk-libdelta");
+const signalk_libpluginstatus_1 = require("signalk-libpluginstatus");
 const PLUGIN_ID = 'range-notifier';
 const PLUGIN_NAME = 'pdjr-skplugin-range-notifier';
 const PLUGIN_DESCRIPTION = 'Operate switches or raise notifications based on value ranges.';
@@ -76,6 +77,7 @@ const PLUGIN_UISCHEMA = {};
 module.exports = function (app) {
     var unsubscribes = [];
     var pluginConfiguration = {};
+    var pluginStatus = new signalk_libpluginstatus_1.PluginStatus(app, '');
     const plugin = {
         id: PLUGIN_ID,
         name: PLUGIN_NAME,
@@ -88,7 +90,7 @@ module.exports = function (app) {
                 pluginConfiguration = makePluginConfiguration(options);
                 app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
                 if (pluginConfiguration.rules.length > 0) {
-                    app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
+                    pluginStatus.setDefaultStatus(`operating ${pluginConfiguration.rules.length} range monitor rules ${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
                     pluginConfiguration.rules.forEach(rule => { app.debug(`applying rule '${rule.name}' to trigger path '${rule.triggerPath}'`); });
                     unsubscribes = pluginConfiguration.rules.map((rule) => (app.streambundle.getSelfStream(rule.triggerPath)
                         .skipDuplicates()
@@ -100,7 +102,7 @@ module.exports = function (app) {
                             switch (controlValue.getName()) {
                                 case 'cancel':
                                     delta.addValue(rule.controlPath, null).commit().clear();
-                                    app.debug(`rule '${rule.name}' cancelling notification on '${rule.controlPath}'`);
+                                    pluginStatus.setStatus(`rule '${rule.name}': cancelling notification on '${rule.controlPath}'`);
                                     rule.lastControlValue = controlValue;
                                     break;
                                 case 'undefined':
@@ -108,11 +110,11 @@ module.exports = function (app) {
                                 default:
                                     if (controlValue.isSwitch()) {
                                         delta.addValue(`${rule.controlPath}.state`, (controlValue.is('on')) ? 1 : 0).commit().clear();
-                                        app.debug(`rule '${rule.name}' switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
+                                        pluginStatus.setStatus(`rule '${rule.name}': switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
                                     }
                                     else {
                                         delta.addValue(rule.controlPath, { state: controlValue.getName(), method: [], message: '' }).commit().clear();
-                                        app.debug(`rule '${rule.name}' issuing '${controlValue.getName()}' notification on '${rule.controlPath}'`);
+                                        pluginStatus.setStatus(`rule '${rule.name}': issuing '${controlValue.getName()}' notification on '${rule.controlPath}'`);
                                     }
                                     rule.lastControlValue = controlValue;
                                     break;
@@ -121,11 +123,11 @@ module.exports = function (app) {
                     })));
                 }
                 else {
-                    app.setPluginStatus('Stopped: configuration includes no valid rules');
+                    pluginStatus.setDefaultStatus('stopped: configuration includes no valid rules');
                 }
             }
             catch (e) {
-                app.setPluginStatus('Stopped: plugin configuration error');
+                pluginStatus.setDefaultStatus('stopped: plugin configuration error');
                 app.setPluginError(e.messge);
             }
             function value2ValueClass(value, rule) {

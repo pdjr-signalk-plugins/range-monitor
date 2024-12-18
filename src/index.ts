@@ -18,6 +18,7 @@ import { ControlValue } from './ControlValue';
 import { Rule } from './Rule';
 import { ValueClass } from './ValueClass';
 import { Delta } from 'signalk-libdelta';
+import { PluginStatus } from 'signalk-libpluginstatus';
 
 const PLUGIN_ID: string = 'range-notifier';
 const PLUGIN_NAME: string = 'pdjr-skplugin-range-notifier';
@@ -78,6 +79,7 @@ const PLUGIN_UISCHEMA: any = {};
 module.exports = function(app: any) {
   var unsubscribes: (() => void)[] = [];
   var pluginConfiguration: PluginConfiguration = <PluginConfiguration>{};
+  var pluginStatus: PluginStatus = new PluginStatus(app, '');
 
   const plugin: SKPlugin = {
 
@@ -95,7 +97,7 @@ module.exports = function(app: any) {
         app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
         
         if (pluginConfiguration.rules.length > 0) {
-          app.setPluginStatus(`Started: monitoring ${pluginConfiguration.rules.length} trigger path${(pluginConfiguration.rules.length == 1)?'':'s'}`);
+          pluginStatus.setDefaultStatus(`operating ${pluginConfiguration.rules.length} range monitor rules ${(pluginConfiguration.rules.length == 1)?'':'s'}`);
           pluginConfiguration.rules.forEach(rule  => { app.debug(`applying rule '${rule.name}' to trigger path '${rule.triggerPath}'`); });
 
           unsubscribes = pluginConfiguration.rules.map((rule) => (
@@ -109,7 +111,7 @@ module.exports = function(app: any) {
                 switch (controlValue.getName()) {
                   case 'cancel':
                     delta.addValue(rule.controlPath, null).commit().clear();
-                    app.debug(`rule '${rule.name}' cancelling notification on '${rule.controlPath}'`);
+                    pluginStatus.setStatus(`rule '${rule.name}': cancelling notification on '${rule.controlPath}'`);
                     rule.lastControlValue = controlValue;
                     break;
                   case 'undefined':
@@ -117,10 +119,10 @@ module.exports = function(app: any) {
                   default:
                     if (controlValue.isSwitch()) {
                       delta.addValue(`${rule.controlPath}.state`, (controlValue.is('on'))?1:0).commit().clear();
-                      app.debug(`rule '${rule.name}' switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
+                      pluginStatus.setStatus(`rule '${rule.name}': switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
                     } else {
                       delta.addValue(rule.controlPath, { state: controlValue.getName(), method: [], message: '' }).commit().clear();
-                      app.debug(`rule '${rule.name}' issuing '${controlValue.getName()}' notification on '${rule.controlPath}'`);          
+                      pluginStatus.setStatus(`rule '${rule.name}': issuing '${controlValue.getName()}' notification on '${rule.controlPath}'`);          
                     }
                     rule.lastControlValue = controlValue;
                     break;
@@ -129,10 +131,10 @@ module.exports = function(app: any) {
             })
           ));
         } else {
-          app.setPluginStatus('Stopped: configuration includes no valid rules');
+          pluginStatus.setDefaultStatus('stopped: configuration includes no valid rules');
         }
       } catch(e: any) {
-        app.setPluginStatus('Stopped: plugin configuration error');
+        pluginStatus.setDefaultStatus('stopped: plugin configuration error');
         app.setPluginError(e.messge);
       }
 

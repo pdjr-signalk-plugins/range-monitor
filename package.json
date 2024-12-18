@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/pdjr-signalk/pdjr-skplugin-range-notifier#readme",
   "dependencies": {
-    "signalk-libdelta": "github:pdjr-signalk/signalk-libdelta"
+    "signalk-libdelta": "github:pdjr-signalk/signalk-libdelta",
+    "signalk-libpluginstatus": "github:pdjr-signalk/signalk-libpluginstatus"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
