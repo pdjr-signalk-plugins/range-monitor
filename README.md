@@ -1,23 +1,38 @@
 # pdjr-skplugin-range-notifier
 
-Raise notifications based on value ranges.
+Operate switches or raise notifications based on value ranges.
 
 ## Description
 
-**pdjr-skplugin-range-notifier** operates one or more user-defined
-*rule*s.
+**pdjr-skplugin-range-notifier** monitors the value of one or more
+Signal K paths, testing each value against a range defined by upper
+and lower thresholds and generating switch or notification outputs
+each time the monitored value transits a threshold.
 
-Each rule specifies a Signal K *path*, a pair of *threshold*s and some
-notification states.
-The *threshold*s define the upper and lower limits of a value range and
-the plugin will issue a notification when the *path* value enters and
-leaves this defined range.
-
-Differences between the various notification property values can be
-used to signal actions: perhaps the control of a discharge pump or the
-monitoring of an engine or other sensor state.
+Careful selection of control values allows the plugin to perform a
+range of functions in response to changing sensor outputs.
 
 ## Configuration
+
+Configuration of the plugin involves the definition of a collection
+of *rule*s, each of which specifies a *trigger path*, a pair of
+*threshold*s, a *control path* and some *control values*.
+
+### Example 1 - operate a pump when tank gets full
+>{  
+>  "configuration": {  
+>    "type": "object",  
+>    "properties": {  
+>      "name": "waste-tank-pumpout",  
+>      "triggerPath": "tanks.0.wasteWater.level",  
+>      "highThreshold": 0.8,  
+>      "lowThreshold": 0.05,
+>      "controlPath": "electrical.switches.bank.12.3.state",  
+>      "
+}
+}
+}
+
 
 The plugin configuration file contains a single *Rules* array property
 where each item is a *Rule* object.
