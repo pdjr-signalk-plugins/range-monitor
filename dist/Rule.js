@@ -22,7 +22,7 @@ class Rule {
             throw new Error('missing \'highThreshold\' property');
         this.name = options.name || 'innominate';
         this.triggerPath = options.triggerPath;
-        this.controlPath = options.controlPath || `notifications.${options.controlPath}`;
+        this.controlPath = options.controlPath || `notifications.${options.triggerPath}`;
         this.lowThreshold = options.lowThreshold;
         this.highThreshold = options.highThreshold;
         this.inRangeControlValue = (options.inRangeControlValue) ? new ControlValue_1.ControlValue(options.inRangeControlValue) : ControlValue_1.ControlValue.undefined,

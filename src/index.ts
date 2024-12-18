@@ -116,7 +116,7 @@ module.exports = function(app: any) {
                     break;
                   default:
                     if (controlValue.isSwitch()) {
-                      delta.addValue(rule.controlPath, (controlValue.is('on'))?1:0).commit().clear();
+                      delta.addValue(`${rule.controlPath}.state`, (controlValue.is('on'))?1:0).commit().clear();
                       app.debug(`rule '${rule.name}' switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
                     } else {
                       delta.addValue(rule.controlPath, { state: controlValue.getName(), method: [], message: '' }).commit().clear();
