@@ -91,7 +91,7 @@ module.exports = function (app) {
                 pluginConfiguration = makePluginConfiguration(options);
                 app.debug(`using configuration: ${JSON.stringify(pluginConfiguration, null, 2)}`);
                 if (pluginConfiguration.rules.length > 0) {
-                    pluginStatus.setDefaultStatus(`operating ${pluginConfiguration.rules.length} range monitor rules ${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
+                    pluginStatus.setDefaultStatus(`operating ${pluginConfiguration.rules.length} range monitor rule${(pluginConfiguration.rules.length == 1) ? '' : 's'}`);
                     pluginConfiguration.rules.forEach(rule => { app.debug(`applying rule '${rule.name}' to trigger path '${rule.triggerPath}'`); });
                     unsubscribes = pluginConfiguration.rules.map((rule) => (app.streambundle.getSelfStream(rule.triggerPath)
                         .skipDuplicates()
