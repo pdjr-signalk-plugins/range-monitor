@@ -1,4 +1,4 @@
-import { NotificationState } from './NotificationState';
+import { ControlValue } from './ControlValue';
 import { ValueClass } from './ValueClass';
 
 export class Rule {
@@ -7,11 +7,11 @@ export class Rule {
   public triggerPath: string = '';
   public lowThreshold: number = 0;
   public highThreshold: number = 0;
-  public notificationPath: string = '';
-  public inRangeNotificationState: NotificationState = NotificationState.undefined;
-  public lowTransitNotificationState: NotificationState = NotificationState.undefined;
-  public highTransitNotificationState: NotificationState = NotificationState.undefined;
-  public lastNotificationState: NotificationState = NotificationState.undefined;
+  public controlPath: string = '';
+  public inRangeControlValue: ControlValue = ControlValue.undefined;
+  public lowTransitControlValue: ControlValue = ControlValue.undefined;
+  public highTransitControlValue: ControlValue = ControlValue.undefined;
+  public lastControlValue: ControlValue = ControlValue.undefined;
 
 
   constructor(options: any) {
@@ -21,22 +21,22 @@ export class Rule {
 
     this.name = options.name || 'innominate';
     this.triggerPath = options.triggerPath;
-    this.notificationPath = options.notificationPath || `notifications.${options.triggerPath}`;
+    this.controlPath = options.controlPath || `notifications.${options.controlPath}`;
     this.lowThreshold = options.lowThreshold;
     this.highThreshold = options.highThreshold;
-    this.inRangeNotificationState = (options.inRangeNotificationState)?new NotificationState(options.inRangeNotificationState):NotificationState.undefined,
-    this.lowTransitNotificationState = (options.lowTransitNotificationState)?new NotificationState(options.lowTransitNotificationState):NotificationState.undefined,
-    this.highTransitNotificationState = (options.highTransitNotificationState)?new NotificationState(options.highTransitNotificationState):NotificationState.undefined,
-    this.lastNotificationState = NotificationState.undefined;
+    this.inRangeControlValue = (options.inRangeControlValue)?new ControlValue(options.inRangeControlValue):ControlValue.undefined,
+    this.lowTransitControlValue = (options.lowTransitControlValue)?new ControlValue(options.lowTransitControlValue):ControlValue.undefined,
+    this.highTransitControlValue = (options.highTransitControlValue)?new ControlValue(options.highTransitControlValue):ControlValue.undefined,
+    this.lastControlValue = ControlValue.undefined
   }
 
-  getNotificationState(valueClass: ValueClass): NotificationState {
+  getControlValue(valueClass: ValueClass): ControlValue {
     switch (valueClass) {
-      case ValueClass.inrange: return(this.inRangeNotificationState);
-      case ValueClass.low: return(this.lowTransitNotificationState);
-      case ValueClass.high: return(this.highTransitNotificationState);
+      case ValueClass.inrange: return(this.inRangeControlValue);
+      case ValueClass.low: return(this.lowTransitControlValue);
+      case ValueClass.high: return(this.highTransitControlValue);
     }
-    return(NotificationState.undefined);
+    return(ControlValue.undefined);
   }
 
 }

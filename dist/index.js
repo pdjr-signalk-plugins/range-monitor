@@ -20,13 +20,13 @@ const ValueClass_1 = require("./ValueClass");
 const signalk_libdelta_1 = require("signalk-libdelta");
 const PLUGIN_ID = 'range-notifier';
 const PLUGIN_NAME = 'pdjr-skplugin-range-notifier';
-const PLUGIN_DESCRIPTION = 'Raise notifications based on value ranges.';
+const PLUGIN_DESCRIPTION = 'Operate switches or raise notifications based on value ranges.';
 const PLUGIN_SCHEMA = {
     "type": "object",
     "properties": {
         "rules": {
-            "type": "array",
             "title": "Rules",
+            "type": "array",
             "items": {
                 "title": "Rule",
                 "type": "object",
@@ -47,24 +47,24 @@ const PLUGIN_SCHEMA = {
                         "title": "High threshold",
                         "type": "number"
                     },
-                    "notificationPath": {
-                        "title": "Notification path",
+                    "controlPath": {
+                        "title": "Control path",
                         "type": "string"
                     },
-                    "inRangeNotificationState": {
-                        "title": "Notification state when in range",
+                    "inRangeControlValue": {
+                        "title": "Control value to use when value on monitored path moves in range",
                         "type": "string",
-                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency"]
+                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency", "on", "off"]
                     },
-                    "lowTransitNotificationState": {
-                        "title": "Notification state when below low threshold",
+                    "lowTransitControlValue": {
+                        "title": "Control value to use when value on monitored path moves below low threshold",
                         "type": "string",
-                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency"]
+                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency", "on", "off"]
                     },
-                    "highTransitNotificationState": {
-                        "title": "Notification state when above hight threshold",
+                    "highTransitControlValue": {
+                        "title": "Control value to use when value on monitored path moves above high threshold",
                         "type": "string",
-                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency"]
+                        "enum": ["cancel", "normal", "alert", "warn", "alarm", "emergency", "on", "off"]
                     }
                 },
                 "required": ["triggerPath", "lowThreshold", "highThreshold"],
@@ -94,21 +94,27 @@ module.exports = function (app) {
                         .skipDuplicates()
                         .map((value) => { app.debug(`rule '${rule.name}' received value ${value}`); return (value2ValueClass(value, rule)); })
                         .skipDuplicates()
-                        .map((valueclass) => { app.debug(`rule '${rule.name}' value classified as '${valueclass.getName()}'`); return (rule.getNotificationState(valueclass)); })
-                        .onValue((notificationState) => {
-                        if (notificationState != rule.lastNotificationState) {
-                            switch (notificationState.getName()) {
+                        .map((valueclass) => { app.debug(`rule '${rule.name}' value classified as '${valueclass.getName()}'`); return (rule.getControlValue(valueclass)); })
+                        .onValue((controlValue) => {
+                        if (controlValue != rule.lastControlValue) {
+                            switch (controlValue.getName()) {
                                 case 'cancel':
-                                    delta.addValue(rule.notificationPath, null).commit().clear();
-                                    app.debug(`rule '${rule.name}' cancelling notification on '${rule.notificationPath}'`);
-                                    rule.lastNotificationState = notificationState;
+                                    delta.addValue(rule.controlPath, null).commit().clear();
+                                    app.debug(`rule '${rule.name}' cancelling notification on '${rule.controlPath}'`);
+                                    rule.lastControlValue = controlValue;
                                     break;
                                 case 'undefined':
                                     break;
                                 default:
-                                    delta.addValue(rule.notificationPath, { state: notificationState.getName(), method: [], message: '' }).commit().clear();
-                                    app.debug(`rule '${rule.name}' issuing '${notificationState.getName()}' notification on '${rule.notificationPath}'`);
-                                    rule.lastNotificationState = notificationState;
+                                    if (controlValue.isSwitch()) {
+                                        delta.addValue(rule.controlPath, (controlValue.is('on')) ? 1 : 0).commit().clear();
+                                        app.debug(`rule '${rule.name}' switching '${rule.controlPath}' ${controlValue.getName().toUpperCase()}`);
+                                    }
+                                    else {
+                                        delta.addValue(rule.controlPath, { state: controlValue.getName(), method: [], message: '' }).commit().clear();
+                                        app.debug(`rule '${rule.name}' issuing '${controlValue.getName()}' notification on '${rule.controlPath}'`);
+                                    }
+                                    rule.lastControlValue = controlValue;
                                     break;
                             }
                         }

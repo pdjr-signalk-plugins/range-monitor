@@ -1,15 +1,15 @@
-import { NotificationState } from './NotificationState';
+import { ControlValue } from './ControlValue';
 import { ValueClass } from './ValueClass';
 export declare class Rule {
     name: string;
     triggerPath: string;
     lowThreshold: number;
     highThreshold: number;
-    notificationPath: string;
-    inRangeNotificationState: NotificationState;
-    lowTransitNotificationState: NotificationState;
-    highTransitNotificationState: NotificationState;
-    lastNotificationState: NotificationState;
+    controlPath: string;
+    inRangeControlValue: ControlValue;
+    lowTransitControlValue: ControlValue;
+    highTransitControlValue: ControlValue;
+    lastControlValue: ControlValue;
     constructor(options: any);
-    getNotificationState(valueClass: ValueClass): NotificationState;
+    getControlValue(valueClass: ValueClass): ControlValue;
 }

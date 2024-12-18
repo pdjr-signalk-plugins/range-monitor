@@ -83,7 +83,7 @@ where each item is a *Rule* object.
 
 ### Configuration example
 
-Signal pump start when a tank reading reaches 80% and pump stop when
+following example 
 tank reading falls below 5%.
 ```
 {
