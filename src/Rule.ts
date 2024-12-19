@@ -1,5 +1,5 @@
 import { ControlValue } from './ControlValue';
-import { ValueClass } from './ValueClass';
+import { RangeClass } from './RangeClass';
 
 export class Rule {
 
@@ -12,7 +12,6 @@ export class Rule {
   public lowTransitControlValue: ControlValue = ControlValue.undefined;
   public highTransitControlValue: ControlValue = ControlValue.undefined;
   public lastControlValue: ControlValue = ControlValue.undefined;
-
 
   constructor(options: any) {
     if (!options.triggerPath) throw new Error('missing \'triggerPath\' property');
@@ -30,11 +29,11 @@ export class Rule {
     this.lastControlValue = ControlValue.undefined
   }
 
-  getControlValue(valueClass: ValueClass): ControlValue {
-    switch (valueClass) {
-      case ValueClass.inrange: return(this.inRangeControlValue);
-      case ValueClass.low: return(this.lowTransitControlValue);
-      case ValueClass.high: return(this.highTransitControlValue);
+  getControlValue(rangeClass: RangeClass): ControlValue {
+    switch (rangeClass) {
+      case RangeClass.inrange: return(this.inRangeControlValue);
+      case RangeClass.low: return(this.lowTransitControlValue);
+      case RangeClass.high: return(this.highTransitControlValue);
     }
     return(ControlValue.undefined);
   }
