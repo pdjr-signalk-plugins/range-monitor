@@ -16,7 +16,7 @@
 
 import { ControlValue } from './ControlValue';
 import { Rule } from './Rule';
-import { RangeClass } from './RangeClass';
+import { Range } from './Range';
 import { Delta } from 'signalk-libdelta';
 import { PluginStatus } from 'signalk-libpluginstatus';
 
@@ -106,7 +106,7 @@ module.exports = function(app: any) {
             .skipDuplicates()
             .map((value: number) => { app.debug(`rule '${rule.name}' received value ${value}`); return(value2ValueClass(value, rule)); })
             .skipDuplicates()
-            .map((rangeClass: RangeClass) => { app.debug(`rule '${rule.name}' value classified as '${rangeClass.getName()}'`); return(rule.getControlValue(rangeClass)); })
+            .map((range: Range) => { app.debug(`rule '${rule.name}' value classified as '${range.getName()}'`); return(rule.getControlValue(range)); })
             .onValue((controlValue: ControlValue) => {
               if (controlValue != rule.lastControlValue) {
                 switch (controlValue.getName()) {
@@ -139,10 +139,10 @@ module.exports = function(app: any) {
         app.setPluginError(e.messge);
       }
 
-      function value2ValueClass(value: number, rule: Rule): RangeClass {
-        if (value <= rule.lowThreshold) return(RangeClass.low);
-        if (value >= rule.highThreshold) return(RangeClass.high);
-        return(RangeClass.inrange);
+      function value2ValueClass(value: number, rule: Rule): Range {
+        if (value <= rule.lowThreshold) return(Range.low);
+        if (value >= rule.highThreshold) return(Range.high);
+        return(Range.inrange);
       }
     
     },

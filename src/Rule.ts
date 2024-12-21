@@ -1,5 +1,5 @@
 import { ControlValue } from './ControlValue';
-import { RangeClass } from './RangeClass';
+import { Range } from './Range';
 
 export class Rule {
 
@@ -29,11 +29,11 @@ export class Rule {
     this.lastControlValue = ControlValue.undefined
   }
 
-  getControlValue(rangeClass: RangeClass): ControlValue {
-    switch (rangeClass) {
-      case RangeClass.inrange: return(this.inRangeControlValue);
-      case RangeClass.low: return(this.lowTransitControlValue);
-      case RangeClass.high: return(this.highTransitControlValue);
+  getControlValue(range: Range): ControlValue {
+    switch (range) {
+      case Range.inrange: return(this.inRangeControlValue);
+      case Range.low: return(this.lowTransitControlValue);
+      case Range.high: return(this.highTransitControlValue);
     }
     return(ControlValue.undefined);
   }

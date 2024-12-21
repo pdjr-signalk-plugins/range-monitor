@@ -1,5 +1,5 @@
 import { ControlValue } from './ControlValue';
-import { RangeClass } from './RangeClass';
+import { Range } from './Range';
 export declare class Rule {
     name: string;
     triggerPath: string;
@@ -11,5 +11,5 @@ export declare class Rule {
     highTransitControlValue: ControlValue;
     lastControlValue: ControlValue;
     constructor(options: any);
-    getControlValue(rangeClass: RangeClass): ControlValue;
+    getControlValue(range: Range): ControlValue;
 }

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Rule = void 0;
 const ControlValue_1 = require("./ControlValue");
-const RangeClass_1 = require("./RangeClass");
+const Range_1 = require("./Range");
 class Rule {
     constructor(options) {
         this.name = '';
@@ -30,11 +30,11 @@ class Rule {
             this.highTransitControlValue = (options.highTransitControlValue) ? new ControlValue_1.ControlValue(options.highTransitControlValue) : ControlValue_1.ControlValue.undefined,
             this.lastControlValue = ControlValue_1.ControlValue.undefined;
     }
-    getControlValue(rangeClass) {
-        switch (rangeClass) {
-            case RangeClass_1.RangeClass.inrange: return (this.inRangeControlValue);
-            case RangeClass_1.RangeClass.low: return (this.lowTransitControlValue);
-            case RangeClass_1.RangeClass.high: return (this.highTransitControlValue);
+    getControlValue(range) {
+        switch (range) {
+            case Range_1.Range.inrange: return (this.inRangeControlValue);
+            case Range_1.Range.low: return (this.lowTransitControlValue);
+            case Range_1.Range.high: return (this.highTransitControlValue);
         }
         return (ControlValue_1.ControlValue.undefined);
     }

@@ -16,7 +16,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const Rule_1 = require("./Rule");
-const RangeClass_1 = require("./RangeClass");
+const Range_1 = require("./Range");
 const signalk_libdelta_1 = require("signalk-libdelta");
 const signalk_libpluginstatus_1 = require("signalk-libpluginstatus");
 const PLUGIN_ID = 'range-notifier';
@@ -97,7 +97,7 @@ module.exports = function (app) {
                         .skipDuplicates()
                         .map((value) => { app.debug(`rule '${rule.name}' received value ${value}`); return (value2ValueClass(value, rule)); })
                         .skipDuplicates()
-                        .map((rangeClass) => { app.debug(`rule '${rule.name}' value classified as '${rangeClass.getName()}'`); return (rule.getControlValue(rangeClass)); })
+                        .map((range) => { app.debug(`rule '${rule.name}' value classified as '${range.getName()}'`); return (rule.getControlValue(range)); })
                         .onValue((controlValue) => {
                         if (controlValue != rule.lastControlValue) {
                             switch (controlValue.getName()) {
@@ -133,10 +133,10 @@ module.exports = function (app) {
             }
             function value2ValueClass(value, rule) {
                 if (value <= rule.lowThreshold)
-                    return (RangeClass_1.RangeClass.low);
+                    return (Range_1.Range.low);
                 if (value >= rule.highThreshold)
-                    return (RangeClass_1.RangeClass.high);
-                return (RangeClass_1.RangeClass.inrange);
+                    return (Range_1.Range.high);
+                return (Range_1.Range.inrange);
             }
         },
         stop: function () {

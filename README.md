@@ -1,13 +1,14 @@
-# pdjr-skplugin-range-notifier
+# pdjr-range-notifier
 
-Operate switches or raise notifications based on value ranges.
+**pdjr-range-notifier** is a
+[Signal K](https://www.signalk.org/)
+plugin which operates switches or raises notifications based on value
+ranges.
 
-## Description
-
-**pdjr-skplugin-range-notifier** monitors the value of one or more
-Signal K paths, testing each value against a range defined by upper
-and lower thresholds and generating switch or notification outputs
-each time the monitored value transits a threshold.
+The plugin monitors the value of one or more Signal K paths, testing
+each value against a range defined by upper and lower thresholds and
+generating switch or notification outputs each time the monitored value
+transits a threshold.
 
 Careful selection of control values allows the plugin to perform a
 range of functions in response to changing sensor outputs.
