@@ -19,9 +19,9 @@ const Rule_1 = require("./Rule");
 const Range_1 = require("./Range");
 const signalk_libdelta_1 = require("signalk-libdelta");
 const signalk_libpluginstatus_1 = require("signalk-libpluginstatus");
-const PLUGIN_ID = 'range-notifier';
-const PLUGIN_NAME = 'pdjr-skplugin-range-notifier';
-const PLUGIN_DESCRIPTION = 'Operate switches or raise notifications based on value ranges.';
+const PLUGIN_ID = 'range-monitor';
+const PLUGIN_NAME = 'pdjr-range-monitor';
+const PLUGIN_DESCRIPTION = 'Monitor path values against range thresholds.';
 const PLUGIN_SCHEMA = {
     "type": "object",
     "properties": {

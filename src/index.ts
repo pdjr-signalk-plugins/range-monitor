@@ -20,9 +20,9 @@ import { Range } from './Range';
 import { Delta } from 'signalk-libdelta';
 import { PluginStatus } from 'signalk-libpluginstatus';
 
-const PLUGIN_ID: string = 'range-notifier';
-const PLUGIN_NAME: string = 'pdjr-skplugin-range-notifier';
-const PLUGIN_DESCRIPTION: string = 'Operate switches or raise notifications based on value ranges.';
+const PLUGIN_ID: string = 'range-monitor';
+const PLUGIN_NAME: string = 'pdjr-range-monitor';
+const PLUGIN_DESCRIPTION: string = 'Monitor path values against range thresholds.';
 const PLUGIN_SCHEMA: any = {
   "type": "object",
   "properties": {
