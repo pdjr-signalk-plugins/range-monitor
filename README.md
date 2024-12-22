@@ -24,7 +24,7 @@ of *rule*s, each of which specifies a *trigger path*, a pair of
 >      "name": "waste-tank-pumpout",  
 >      "triggerPath": "tanks.0.wasteWater.level",  
 >      "highThreshold": 0.8,  
->      "lowThreshold": 0.05,
+>      "lowThreshold": 0.05,  
 >      "controlPath": "electrical.switches.bank.12.3.state",  
 >      "
 }
