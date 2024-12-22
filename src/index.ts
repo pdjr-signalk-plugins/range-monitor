@@ -180,3 +180,4 @@ interface SKPlugin {
 interface PluginConfiguration {
   rules: Rule[]
 }
+
