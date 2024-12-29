@@ -1,6 +1,6 @@
 # pdjr-range-monitor
 
-**pdjr-range-monitor** is a
+**range-monitor** is a
 [Signal K](https://www.signalk.org/)
 plugin which monitors the value of one or more Signal K paths, testing
 each value against a range defined by upper and lower thresholds and
