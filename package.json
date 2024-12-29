@@ -1,5 +1,5 @@
 {
-  "name": "pdjr-range-monitor",
+  "name": "range-monitor",
   "version": "2.1.0",
   "description": "Monitor path values against range thresholds.",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pdjr-signalk/pdjr-range-monitor.git"
+    "url": "git+https://github.com/pdjr-signalk-plugins/range-monitor.git"
   },
   "keywords": [
     "signalk-node-server-plugin",
@@ -22,9 +22,9 @@
   "author": "Paul Reeve <preeve@pdjr.eu>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/pdjr-signalk/pdjr-range-monitor/issues"
+    "url": "https://github.com/pdjr-signalk-plugins/range-monitor/issues"
   },
-  "homepage": "https://github.com/pdjr-signalk/pdjr-range-monitor#readme",
+  "homepage": "https://github.com/pdjr-signalk-pluginsrange-monitor#readme",
   "dependencies": {
     "signalk-libdelta": "github:pdjr-signalk/signalk-libdelta",
     "signalk-libpluginstatus": "github:pdjr-signalk/signalk-libpluginstatus"
