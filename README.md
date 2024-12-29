@@ -1,4 +1,4 @@
-# pdjr-range-monitor
+# range-monitor
 
 **range-monitor** is a
 [Signal K](https://www.signalk.org/)
